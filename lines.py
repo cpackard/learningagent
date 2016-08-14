@@ -1,3 +1,6 @@
+import math
+
+
 class Point():
 
     def __init__(self, x, y):
@@ -9,6 +12,9 @@ class Point():
 
     def __eq__(self, other):
         return (self.x, self.y) == (other.x, other.y)
+
+    def __lt__(self, other):
+        return ((self.x < other.x) and (self.y < other.y))
 
 
 class Obstacle():
@@ -121,6 +127,34 @@ def do_intersect(p1, q1, p2, q2):
         return False
 
 
+def distance(p1, p2):
+    """
+    Given two points, return the distance between them.
+    """
+    return math.sqrt((p2.x - p1.x)**2 + (p2.y - p1.y)**2)
+
+
+# TODO Write tests for the next two functions
+def point_inside_own_obstacle(p, O):
+    """
+    Given a point and an obstacle, determine if p is part of O.
+    """
+    return p in [v[0] for v in O.lines]
+
+
+def line_is_valid_for_own_obstacle(p, r, O):
+    """
+    Given a line pr and its member obstacle O, determine if line pr
+    crosses through O.
+    """
+    line_in_obstacle = False
+
+    for line in O.lines:
+        if (sorted([p, r], key=lambda p: p.x + p.y) ==
+            sorted(line, key=lambda p: p.x + p.y)):
+            line_in_obstacle = True
+
+    return line_in_obstacle
 
 def obstacle_inside_area(p, r, O):
     """
