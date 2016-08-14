@@ -121,28 +121,59 @@ class TestRobotMaze(unittest.TestCase):
                                 key=lambda p: p.x + p.y))
 
 
-        def test_goal_test(self):
-            goal_point = lines.Point(29, 17)
+    def test_goal_test(self):
+        goal_point = lines.Point(29, 17)
 
-            # Test reachable goal from open space
-            p = lines.Point(30, 12)
+        # Test reachable goal from open space
+        p = lines.Point(30, 12)
 
-            self.assertTrue(robot_maze.goal_test(p, goal_point, obstacles.obstacles))
+        self.assertTrue(robot_maze.goal_test(p, goal_point, obstacles.obstacles))
 
-            # Test reachable goal from polygon
-            p = lines.Point(29, 21)
+        # Test reachable goal from polygon
+        p = lines.Point(29, 21)
 
-            self.assertTrue(robot_maze.goal_test(p, goal_point, obstacles.obstacles))
+        self.assertTrue(robot_maze.goal_test(p, goal_point, obstacles.obstacles))
 
-            # Test unreachable goal from open space
-            p = lines.Point(21, 18)
+        # Test unreachable goal from open space
+        p = lines.Point(21, 18)
 
-            self.assertFalse(robot_maze.goal_test(p, goal_point, obstacles.obstacles))
+        self.assertFalse(robot_maze.goal_test(p, goal_point, obstacles.obstacles))
 
-            # Test unreachable goal from polygon
-            p = lines.Point(21, 20)
+        # Test unreachable goal from polygon
+        p = lines.Point(21, 20)
 
-            self.assertFalse(robot_maze.goal_test(p, goal_point, obstacles.obstacles))
+        self.assertFalse(robot_maze.goal_test(p, goal_point, obstacles.obstacles))
+
+
+    def test_heuristic(self):
+        # For now these tests are slightly redundant since heuristic is just
+        # a straight line, but since the heuristic could change in the
+        # future it's better to have them.
+
+        # Test straight horizontal line
+        p1 = lines.Point(1, 1)
+        goal = lines.Point(4, 1)
+
+        self.assertEqual(3, robot_maze.heuristic(p1, goal))
+
+        # Test straight vertical line
+        p1 = lines.Point(1, 1)
+        goal = lines.Point(1, 4)
+
+        self.assertEqual(3, robot_maze.heuristic(p1, goal))
+
+        # Test positive horizontal line
+        p1 = lines.Point(1, 1)
+        goal = lines.Point(4, 4)
+
+        self.assertEqual(4.242640687119285, robot_maze.heuristic(p1, goal))
+
+        # Test negative horizontal line
+        p1 = lines.Point(1, 1)
+        goal = lines.Point(-2, -2)
+
+        self.assertEqual(4.242640687119285, robot_maze.heuristic(p1, goal))
+
 
 
 

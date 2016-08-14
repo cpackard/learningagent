@@ -41,11 +41,19 @@ s = None # the previous state, initially null
 a = None # the previous action, initially null
 
 def goal_test(p, goal, obstacles):
+    """
+    Give a position p and a goal point, determine if there is an unblocked
+    path from p to the goal.
+    """
     return line_is_unblocked(p, goal, obstacles)
 
 
-def heuristic():
-    pass
+def heuristic(p, goal):
+    """
+    Heuristic function to return an (optimistic) cost estimate from
+    point p to the goal.
+    """
+    return lines.distance(p, goal)
 
 
 def actions(state):
