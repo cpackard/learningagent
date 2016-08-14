@@ -34,18 +34,14 @@ def visible_vertices(p, obstacles):
     return V
 
 
-
-
-
-
 # persistent for LRTA*
 result = {} # a table indexed by state and action, initially empty
 H = {} # a table of cost estimates indexed by state, initially empty
 s = None # the previous state, initially null
 a = None # the previous action, initially null
 
-def goal_test():
-    pass
+def goal_test(p, goal, obstacles):
+    return line_is_unblocked(p, goal, obstacles)
 
 
 def heuristic():
@@ -54,9 +50,6 @@ def heuristic():
 
 def actions(state):
     pass
-
-
-
 
 
 def LRTA_star_cost(prev_state, action, state, h_table):

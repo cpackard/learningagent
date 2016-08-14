@@ -121,6 +121,30 @@ class TestRobotMaze(unittest.TestCase):
                                 key=lambda p: p.x + p.y))
 
 
+        def test_goal_test(self):
+            goal_point = lines.Point(29, 17)
+
+            # Test reachable goal from open space
+            p = lines.Point(30, 12)
+
+            self.assertTrue(robot_maze.goal_test(p, goal_point, obstacles.obstacles))
+
+            # Test reachable goal from polygon
+            p = lines.Point(29, 21)
+
+            self.assertTrue(robot_maze.goal_test(p, goal_point, obstacles.obstacles))
+
+            # Test unreachable goal from open space
+            p = lines.Point(21, 18)
+
+            self.assertFalse(robot_maze.goal_test(p, goal_point, obstacles.obstacles))
+
+            # Test unreachable goal from polygon
+            p = lines.Point(21, 20)
+
+            self.assertFalse(robot_maze.goal_test(p, goal_point, obstacles.obstacles))
+
+
 
 if __name__ == "__main__":
     unittest.main()
