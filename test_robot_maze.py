@@ -189,6 +189,39 @@ class TestRobotMaze(unittest.TestCase):
         self.assertEqual(4.242640687119285, robot_maze.actual_cost(s1, s2, s2))
 
 
+    def test_actions(self):
+        # Redundant since this only makes a call to visible_vertices, so only
+        # test a subset of visible_vertices tests for a sanity check.
+
+        # Test upper-right corner (open space)
+        state = lines.Point(34, 22)
+
+        self.assertEqual(set([lines.Point(32, 23), lines.Point(35, 21)]),
+                         set(robot_maze.actions(state)))
+
+        # Test lower-left corner (open space)
+        state = lines.Point(5, 1)
+
+        self.assertEqual(set([lines.Point(5, 20), lines.Point(6, 2),
+                              lines.Point(6, 10), lines.Point(18, 2)]),
+                         set(robot_maze.actions(state)))
+
+        # Test far-right vertex of pentagon
+        state = lines.Point(12, 19)
+
+        self.assertEqual(set([lines.Point(8.5, 23), lines.Point(14.5, 21),
+                              lines.Point(10, 14), lines.Point(13, 14)]),
+                         set(robot_maze.actions(state)))
+
+        # Test top of triangle1 (on triangle)
+        state = lines.Point(14.5, 21)
+
+        self.assertEqual(set([lines.Point(13, 14), lines.Point(16, 14),
+                              lines.Point(18.5, 23), lines.Point(16.5, 21.5),
+                              lines.Point(10, 14), lines.Point(16, 17),
+                              lines.Point(12, 19), lines.Point(8.5, 23),
+                              lines.Point(19, 7), lines.Point(18, 10)]),
+                         set(robot_maze.actions(state)))
 
 
 if __name__ == "__main__":

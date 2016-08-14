@@ -63,7 +63,10 @@ def actual_cost(s1, action, s2):
 
 
 def actions(state):
-    pass
+    """
+    Given a state, return a list of all possible actions from that state.
+    """
+    return visible_vertices(state, obstacles.obstacles)
 
 
 # persistent for LRTA*
