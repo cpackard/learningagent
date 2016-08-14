@@ -34,12 +34,6 @@ def visible_vertices(p, obstacles):
     return V
 
 
-# persistent for LRTA*
-result = {} # a table indexed by state and action, initially empty
-H = {} # a table of cost estimates indexed by state, initially empty
-s = None # the previous state, initially null
-a = None # the previous action, initially null
-
 def goal_test(p, goal, obstacles):
     """
     Give a position p and a goal point, determine if there is an unblocked
@@ -56,8 +50,29 @@ def heuristic(p, goal):
     return lines.distance(p, goal)
 
 
+def actual_cost(s1, action, s2):
+    """
+    Given an action and two states s1, s2, return the cost of performing
+    the action in state s1 to end in state s2.
+    """
+    # For now, we will model an action simply as the destination point of the
+    # agent. Therefore, we will assume action == s2, as though the agent either
+    # reached the intended destination, or recovered from an error and then
+    # reached the destination.
+    return lines.distance(s1, s2)
+
+
 def actions(state):
     pass
+
+
+# persistent for LRTA*
+result = {} # a table indexed by state and action, initially empty
+H = {} # a table of cost estimates indexed by state, initially empty
+s = None # the previous state, initially null
+a = None # the previous action, initially null
+
+
 
 
 def LRTA_star_cost(prev_state, action, state, h_table):

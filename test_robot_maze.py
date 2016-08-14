@@ -41,84 +41,68 @@ class TestRobotMaze(unittest.TestCase):
         # Test upper-right corner (open space)
         p = lines.Point(34, 22)
 
-        self.assertEqual(sorted([lines.Point(32, 23), lines.Point(35, 21)],
-                                key=lambda p: p.x + p.y),
-                         sorted(robot_maze.visible_vertices(p, obstacles.obstacles),
-                                key=lambda p: p.x + p.y))
+        self.assertEqual(set([lines.Point(32, 23), lines.Point(35, 21)]),
+                         set(robot_maze.visible_vertices(p, obstacles.obstacles)))
 
         # Test lower-left corner (open space)
         p = lines.Point(5, 1)
 
-        self.assertEqual(sorted([lines.Point(5, 20), lines.Point(6, 2),
-                                 lines.Point(6, 10), lines.Point(18, 2)],
-                                key=lambda p: p.x + p.y),
-                         sorted(robot_maze.visible_vertices(p, obstacles.obstacles),
-                                key=lambda p: p.x + p.y))
+        self.assertEqual(set([lines.Point(5, 20), lines.Point(6, 2),
+                              lines.Point(6, 10), lines.Point(18, 2)]),
+                         set(robot_maze.visible_vertices(p, obstacles.obstacles)))
 
 
         # Test bottom-middle (open space)
         p = lines.Point(23, 8)
 
-        self.assertEqual(sorted([lines.Point(18, 2), lines.Point(19, 7),
-                                 lines.Point(23, 9), lines.Point(27, 11),
-                                 lines.Point(29, 12), lines.Point(29, 3),
-                                 lines.Point(26, 9), lines.Point(26, 6)],
-                                key=lambda p: p.x + p.y),
-                         sorted(robot_maze.visible_vertices(p, obstacles.obstacles),
-                                key=lambda p: p.x + p.y))
+        self.assertEqual(set([lines.Point(18, 2), lines.Point(19, 7),
+                              lines.Point(23, 9), lines.Point(27, 11),
+                              lines.Point(29, 12), lines.Point(29, 3),
+                              lines.Point(26, 9), lines.Point(26, 6)]),
+                         set(robot_maze.visible_vertices(p, obstacles.obstacles)))
 
         # Test bottom-middle (on triangle)
         p = lines.Point(23, 9)
 
-        self.assertEqual(sorted([lines.Point(18, 2), lines.Point(19, 7),
-                                 lines.Point(19, 12), lines.Point(26, 6),
-                                 lines.Point(16, 17), lines.Point(22, 11),
-                                 lines.Point(26, 9), lines.Point(27, 11)],
-                                key=lambda p: p.x + p.y),
-                         sorted(robot_maze.visible_vertices(p, obstacles.obstacles),
-                                key=lambda p: p.x + p.y))
+        self.assertEqual(set([lines.Point(18, 2), lines.Point(19, 7),
+                              lines.Point(19, 12), lines.Point(26, 6),
+                              lines.Point(16, 17), lines.Point(22, 11),
+                              lines.Point(26, 9), lines.Point(27, 11)]),
+                         set(robot_maze.visible_vertices(p, obstacles.obstacles)))
 
 
         # Test far-right vertex of pentagon
         p = lines.Point(12, 19)
 
-        self.assertEqual(sorted([lines.Point(8.5, 23), lines.Point(14.5, 21),
-                                 lines.Point(10, 14), lines.Point(13, 14)],
-                                key=lambda p: p.x + p.y),
-                         sorted(robot_maze.visible_vertices(p, obstacles.obstacles),
-                                key=lambda p: p.x + p.y))
+        self.assertEqual(set([lines.Point(8.5, 23), lines.Point(14.5, 21),
+                              lines.Point(10, 14), lines.Point(13, 14)]),
+                         set(robot_maze.visible_vertices(p, obstacles.obstacles)))
 
         # Test bottom of quadrilateral (on vertex)
         p = lines.Point(32, 11)
 
-        self.assertEqual(sorted([lines.Point(29, 12), lines.Point(32, 9),
-                                 lines.Point(27, 23), lines.Point(29, 21),
-                                 lines.Point(35, 21)],
-                                key=lambda p: p.x + p.y),
-                         sorted(robot_maze.visible_vertices(p, obstacles.obstacles),
-                                key=lambda p: p.x + p.y))
+        self.assertEqual(set([lines.Point(29, 12), lines.Point(32, 9),
+                              lines.Point(27, 23), lines.Point(29, 21),
+                              lines.Point(35, 21)]),
+                         set(robot_maze.visible_vertices(p, obstacles.obstacles)))
 
         # Test upper-left corner of rectangle2
         p = lines.Point(22, 23)
 
-        self.assertEqual(sorted([lines.Point(27, 23), lines.Point(22, 11),
-                                 lines.Point(18.5, 23), lines.Point(21, 20),
-                                 lines.Point(18, 10), lines.Point(19, 12)],
-                                key=lambda p: p.x + p.y),
-                         sorted(robot_maze.visible_vertices(p, obstacles.obstacles),
-                                key=lambda p: p.x + p.y))
+        self.assertEqual(set([lines.Point(27, 23), lines.Point(22, 11),
+                              lines.Point(18.5, 23), lines.Point(21, 20),
+                              lines.Point(18, 10), lines.Point(19, 12)]),
+                         set(robot_maze.visible_vertices(p, obstacles.obstacles)))
 
         # Test top of triangle1 (on triangle)
         p = lines.Point(14.5, 21)
 
-        self.assertEqual(sorted([lines.Point(13, 14), lines.Point(16, 14),
-                                 lines.Point(18.5, 23), lines.Point(16.5, 21.5),
-                                 lines.Point(10, 14), lines.Point(16, 17),
-                                 lines.Point(12, 19), lines.Point(8.5, 23),
-                                 lines.Point(19, 7), lines.Point(18, 10)],
-                                key=lambda p: p.x + p.y),
-                         sorted(robot_maze.visible_vertices(p, obstacles.obstacles),
-                                key=lambda p: p.x + p.y))
+        self.assertEqual(set([lines.Point(13, 14), lines.Point(16, 14),
+                              lines.Point(18.5, 23), lines.Point(16.5, 21.5),
+                              lines.Point(10, 14), lines.Point(16, 17),
+                              lines.Point(12, 19), lines.Point(8.5, 23),
+                              lines.Point(19, 7), lines.Point(18, 10)]),
+                         set(robot_maze.visible_vertices(p, obstacles.obstacles)))
 
 
     def test_goal_test(self):
@@ -173,6 +157,36 @@ class TestRobotMaze(unittest.TestCase):
         goal = lines.Point(-2, -2)
 
         self.assertEqual(4.242640687119285, robot_maze.heuristic(p1, goal))
+
+
+    def test_heuristic(self):
+        # For now these tests are also redundant since actual_cost is just
+        # a straight line, but this could also change in the future, so
+        # we keep them.
+
+        # Test straight horizontal line
+        s1 = lines.Point(1, 1)
+        s2 = lines.Point(4, 1)
+
+        self.assertEqual(3, robot_maze.actual_cost(s1, s2, s2))
+
+        # Test straight vertical line
+        s1 = lines.Point(1, 1)
+        s2 = lines.Point(1, 4)
+
+        self.assertEqual(3, robot_maze.actual_cost(s1, s2, s2))
+
+        # Test positive horizontal line
+        s1 = lines.Point(1, 1)
+        s2 = lines.Point(4, 4)
+
+        self.assertEqual(4.242640687119285, robot_maze.actual_cost(s1, s2, s2))
+
+        # Test negative horizontal line
+        s1 = lines.Point(1, 1)
+        s2 = lines.Point(-2, -2)
+
+        self.assertEqual(4.242640687119285, robot_maze.actual_cost(s1, s2, s2))
 
 
 
