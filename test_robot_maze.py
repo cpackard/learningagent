@@ -105,6 +105,87 @@ class TestRobotMaze(unittest.TestCase):
                          set(robot_maze.visible_vertices(p, obstacles.obstacles)))
 
 
+    def test_vertices_relative_to_agent(self):
+        # Test arbitrary points
+        p = lines.Point(5, 5)
+        vertices = [lines.Point(7, 7), lines.Point(4, 6),
+                    lines.Point(5, 3), lines.Point(1, 5),
+                    lines.Point(7, 0)]
+
+
+        self.assertEqual(set([lines.Point(2, 2), lines.Point(-1, 1),
+                              lines.Point(0, -2), lines.Point(-4, 0),
+                              lines.Point(2, -5)]),
+                         set(robot_maze.vertices_relative_to_agent(vertices, p)))
+
+        # Test open space in maze near top-left corner
+        p = lines.Point(34, 22)
+        vertices = robot_maze.visible_vertices(p, obstacles.obstacles)
+
+        self.assertEqual(set([lines.Point(-2, 1), lines.Point(1, -1)]),
+                         set(robot_maze.vertices_relative_to_agent(vertices, p)))
+
+        # Test on hexagon vertex in maze
+        p = lines.Point(32, 6)
+        vertices = robot_maze.visible_vertices(p, obstacles.obstacles)
+
+        self.assertEqual(set([lines.Point(-3, -3), lines.Point(0, 3),
+                              lines.Point(3, 15)]),
+                         set(robot_maze.vertices_relative_to_agent(vertices, p)))
+
+        # Test open space in maze in between pentagon and triangle
+        p = lines.Point(13, 19)
+        vertices = robot_maze.visible_vertices(p, obstacles.obstacles)
+
+        self.assertEqual(set([lines.Point(-1, 0), lines.Point(-3, -5),
+                              lines.Point(-4.5, 4), lines.Point(0, -5),
+                              lines.Point(1.5, 2)]),
+                         set(robot_maze.vertices_relative_to_agent(vertices, p)))
+
+
+
+    def test_get_locations(self):
+        # Test upper-right corner (open space)
+        p = lines.Point(34, 22)
+        vertex_list = robot_maze.visible_vertices(p, obstacles.obstacles)
+        agent_vertex_list = robot_maze.vertices_relative_to_agent(vertex_list, p)
+
+        self.assertEqual(set([lines.Point(34, 22), lines.Point(18, 13)]),
+                         set(robot_maze.get_locations(agent_vertex_list, obstacles.obstacles)))
+
+        # Test upper-left corner above pentagon (open space)
+        p = lines.Point(12, 21)
+        vertex_list = robot_maze.visible_vertices(p, obstacles.obstacles)
+        agent_vertex_list = robot_maze.vertices_relative_to_agent(vertex_list, p)
+
+        self.assertEqual(set([lines.Point(12, 21)]),
+                         set(robot_maze.get_locations(agent_vertex_list, obstacles.obstacles)))
+
+        # Test lower-right corner of hexagon (on polygon)
+        p = lines.Point(32, 6)
+        vertex_list = robot_maze.visible_vertices(p, obstacles.obstacles)
+        agent_vertex_list = robot_maze.vertices_relative_to_agent(vertex_list, p)
+
+        self.assertEqual(set([lines.Point(32, 6)]),
+                         set(robot_maze.get_locations(agent_vertex_list, obstacles.obstacles)))
+
+        # Test open space in middle
+        p = lines.Point(5, 20)
+        vertex_list = robot_maze.visible_vertices(p, obstacles.obstacles)
+        agent_vertex_list = robot_maze.vertices_relative_to_agent(vertex_list, p)
+
+        self.assertEqual(set([lines.Point(5, 20)]),
+                         set(robot_maze.get_locations(agent_vertex_list, obstacles.obstacles)))
+
+        # Test far-left side of pentagon (on polygon)
+        p = lines.Point(20, 16)
+        vertex_list = robot_maze.visible_vertices(p, obstacles.obstacles)
+        agent_vertex_list = robot_maze.vertices_relative_to_agent(vertex_list, p)
+
+        self.assertEqual(set([lines.Point(20, 16)]),
+                         set(robot_maze.get_locations(agent_vertex_list, obstacles.obstacles)))
+
+
     def test_goal_test(self):
         goal_point = lines.Point(29, 17)
 
