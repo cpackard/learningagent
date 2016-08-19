@@ -305,5 +305,86 @@ class TestRobotMaze(unittest.TestCase):
                          set(robot_maze.actions(state)))
 
 
+    def test_perform_action(self):
+        # TODO Beef up these tests after we add random failure logic
+        action = lines.Point(1, 1)
+        self.assertEqual(action, robot_maze.perform_action(action))
+
+
+    def test_LRTA_star_cost(self):
+        # Test without state
+        prev_state = lines.Point(1, 1)
+        action = lines.Point(3, 1)
+        state = None
+        cost_estimates = {lines.Point(3, 1): 2, lines.Point(1, 1): 4}
+        goal_point = lines.Point(5, 1)
+
+        self.assertEqual(4, robot_maze.LRTA_star_cost(prev_state, action,
+                                                      state, cost_estimates,
+                                                      goal_point))
+
+        # Test with state
+        state = lines.Point(3, 1)
+        self.assertEqual(4, robot_maze.LRTA_star_cost(prev_state, action,
+                                                      state, cost_estimates,
+                                                      goal_point))
+
+
+    def test_LRTA_star_agent(self):
+        result = {}
+        cost_estimates = {}
+        prev_state = None
+        prev_action = None
+        goal_point = lines.Point(5, 5)
+        agent_location = lines.Point(4, 5)
+
+        self.assertEqual(None, robot_maze.LRTA_star_agent(
+            agent_location, goal_point, obstacles.obstacles, result,
+            cost_estimates, prev_state, prev_action))
+
+
+        # Update goal point so agent has to plan an action
+        goal_point = lines.Point(34, 22)
+
+        prev_action, prev_state, result, cost_estimates = robot_maze.LRTA_star_agent(
+            agent_location, goal_point, obstacles.obstacles, result,
+            cost_estimates, prev_state, prev_action)
+
+        self.assertEqual(cost_estimates[prev_state],
+                         robot_maze.heuristic(prev_state, goal_point))
+
+        self.assertFalse((None, None) in result)
+
+        self.assertFalse(None in cost_estimates)
+
+        self.assertEqual(lines.Point(6, 2), prev_action)
+
+        self.assertEqual(lines.Point(4, 5), prev_state)
+
+        agent_location = robot_maze.perform_action(prev_action)
+
+        prev_action, prev_state, result, cost_estimates = robot_maze.LRTA_star_agent(
+            agent_location, goal_point, obstacles.obstacles, result,
+            cost_estimates, prev_state, prev_action)
+
+        self.assertEqual(prev_state,
+                         result[(lines.Point(4, 5), lines.Point(6, 2))])
+
+        self.assertEqual(34.48187929913333, cost_estimates[lines.Point(4, 5)])
+
+        self.assertEqual(lines.Point(18, 2), prev_action)
+
+        self.assertEqual(lines.Point(6, 2), prev_state)
+
+
+    def test_run_simulation(self):
+        number_of_turns = 1000
+        goal_point = lines.Point(34, 22)
+        initial_location = lines.Point(5, 5)
+
+        self.assertTrue(robot_maze.run_simulation(
+            number_of_turns, goal_point, initial_location, obstacles.obstacles))
+
+
 if __name__ == "__main__":
     unittest.main()

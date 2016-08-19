@@ -120,41 +120,121 @@ def get_locations(percepts, obstacles):
     return possible_locations
 
 
-# persistent for LRTA*
-result = {} # a table indexed by state and action, initially empty
-H = {} # a table of cost estimates indexed by state, initially empty
-s = None # the previous state, initially null
-a = None # the previous action, initially null
+def perform_action(action):
+    """
+    Given an action, simulate the agent performing that action and return
+    the new location of the agent as a result of that action.
+    """
+    # TODO Add logic to have the agent land at a nearby vertex
+    # (instead of the intended destination) 30% of the time
+    return action
 
 
-def LRTA_star_cost(prev_state, action, state, h_table):
+def LRTA_star_cost(prev_state, action, state, cost_estimates, goal):
     """
     Returns the f-value of a given state: g(s) + h(s)
     """
     if state is None:
-        return heuristic(prev_state)
+        return heuristic(prev_state, goal)
     else:
-        return actual_cost(prev_state, action, state) + h_table[state]
+        return actual_cost(prev_state, action, state) + cost_estimates[state]
+
+
 
 
 # LRTA* algorithm from AIMA
-# TODO Revisit this and make sure implementation is correct
-def LRTA_star_agent(state):
+def LRTA_star_agent(state, goal, obstacles, result,
+                    cost_estimates, prev_state, prev_action):
     """
     Given a percept that identifies the current state, return the next
     action to take, or None if the goal is reached.
+
+    LRTA_star_agent select an action according to the values of neighboring
+    states, which are updated as the agent moves about the state space.
     """
-    if goal_test(state):
+    if goal_test(state, goal, obstacles):
         return None
 
-    if state not in H:
-        H[state] = heuristic(state)
+    if state not in cost_estimates:
+        cost_estimates[state] = heuristic(state, goal)
 
-    if s is not null:
-        result[(s, a)] = state
-        H[state] = min([LRTA_star_cost(s, b, result[(s, b)], H) for b in actions(s)])
+    if prev_state:
+        result[(prev_state, prev_action)] = state
 
-    a = min([(b, LRTA_star_cost(state, b, result[(state, b)], H)) for b in actions(state)])
-    s = state
+        cost_estimates[prev_state] = min(
+            [LRTA_star_cost(
+                prev_state,
+                action,
+                result.get((prev_state, action)),
+                cost_estimates,
+                goal)
+             for action in actions(prev_state)])
 
-    return a
+    # TODO Possibly refactor this to another location
+    def lrta_action_cost(action):
+        return LRTA_star_cost(state, action,
+                              result.get((state, action)), cost_estimates, goal)
+
+    prev_action = min([action for action in actions(state)], key=lrta_action_cost)
+
+    prev_state = state
+
+    return prev_action, prev_state, result, cost_estimates
+
+
+def run_simulation(number_of_turns, goal_point, initial_location, obstacles):
+    """
+    Given the number of turns allowed, run the simulation for the agent
+    navigating a maze of polygons.
+    """
+    agent_location = initial_location
+    remaining_turns = number_of_turns
+
+    # persistent for LRTA*
+
+    # a table indexed by state and action, initially empty
+    result = {}
+    # a table of cost estimates indexed by state, initially empty
+    cost_estimates = {}
+    # the previous state, initially null
+    prev_state = None
+    # the previous action, initially null
+    prev_action = None
+
+    print('Agent starting at point {}'.format(initial_location))
+
+    while remaining_turns > 0:
+        print('Agent currently at point {}'.format(agent_location))
+
+        if line_is_unblocked(agent_location, goal_point, obstacles):
+            # TODO Add logic to re-spawn the agent at a random location
+            # after reaching the goal.
+            print("Agent has reached the goal in {} turns!".format(
+                number_of_turns - remaining_turns - 1))
+            return True
+
+        prev_action, prev_state, result, cost_estimates = LRTA_star_agent(
+            agent_location, goal_point, obstacles, result,
+            cost_estimates, prev_state, prev_action)
+
+        print('Agent attempting to reach point {}'.format(prev_action))
+
+        agent_location = perform_action(prev_action)
+
+        print('Agent now at point {}'.format(agent_location))
+
+        remaining_turns -= 1
+
+    print('Agent failed to find goal in alloted turns.')
+    print('Final agent location: {}'.format(agent_location))
+
+    return False
+
+
+if __name__ == "__main__":
+    number_of_turns = 1000
+    goal_point = lines.Point(34, 22)
+    initial_location = lines.Point(5, 5)
+
+    run_simulation(number_of_turns, goal_point,
+                   initial_location, obstacles.obstacles)
