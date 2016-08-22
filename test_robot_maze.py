@@ -189,25 +189,11 @@ class TestRobotMaze(unittest.TestCase):
     def test_goal_test(self):
         goal_point = lines.Point(29, 17)
 
-        # Test reachable goal from open space
         p = lines.Point(30, 12)
+        self.assertFalse(robot_maze.goal_test(p, goal_point))
 
-        self.assertTrue(robot_maze.goal_test(p, goal_point, obstacles.obstacles))
-
-        # Test reachable goal from polygon
-        p = lines.Point(29, 21)
-
-        self.assertTrue(robot_maze.goal_test(p, goal_point, obstacles.obstacles))
-
-        # Test unreachable goal from open space
-        p = lines.Point(21, 18)
-
-        self.assertFalse(robot_maze.goal_test(p, goal_point, obstacles.obstacles))
-
-        # Test unreachable goal from polygon
-        p = lines.Point(21, 20)
-
-        self.assertFalse(robot_maze.goal_test(p, goal_point, obstacles.obstacles))
+        q = lines.Point(29, 17)
+        self.assertTrue(robot_maze.goal_test(q, goal_point))
 
 
     def test_heuristic(self):
@@ -335,10 +321,10 @@ class TestRobotMaze(unittest.TestCase):
         cost_estimates = {}
         prev_state = None
         prev_action = None
-        goal_point = lines.Point(5, 5)
+        goal_point = lines.Point(4, 5)
         agent_location = lines.Point(4, 5)
 
-        self.assertEqual(None, robot_maze.LRTA_star_agent(
+        self.assertEqual((None, None, {}, {}), robot_maze.LRTA_star_agent(
             agent_location, goal_point, obstacles.obstacles, result,
             cost_estimates, prev_state, prev_action))
 
