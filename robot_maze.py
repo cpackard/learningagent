@@ -192,16 +192,15 @@ def run_simulation(number_of_turns, goal_point, initial_location, obstacles):
 
     # persistent for LRTA*
 
-    # a table indexed by state and action, initially empty
+    # a table indexed by state and action
     result = {}
-    # a table of cost estimates indexed by state, initially empty
+    # a table of cost estimates indexed by state
     cost_estimates = {}
-    # the previous state, initially null
     prev_state = None
-    # the previous action, initially null
     prev_action = None
 
     print('Agent starting at point {}'.format(initial_location))
+    print('Agent goal: {}'.format(goal_point))
 
     while remaining_turns > 0:
         print('Agent currently at point {}'.format(agent_location))
