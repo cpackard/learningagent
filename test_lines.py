@@ -1,6 +1,6 @@
 import unittest
 import lines
-import obstacles
+import environment_details
 
 class TestLines(unittest.TestCase):
 
@@ -157,21 +157,21 @@ class TestLines(unittest.TestCase):
         # Test obstacle clearly inside area
         p = lines.Point(23, 9)
         r = lines.Point(6, 10)
-        O = obstacles.rectangle1
+        O = environment_details.rectangle1
 
         self.assertTrue(lines.obstacle_inside_area(p, r, O))
 
         # Test obstacle clearly outside area
         p = lines.Point(26, 9)
         r = lines.Point(23, 9)
-        O = obstacles.rectangle2
+        O = environment_details.rectangle2
 
         self.assertFalse(lines.obstacle_inside_area(p, r, O))
 
         # Test obstacle on edge of area
         p = lines.Point(19, 7)
         r = lines.Point(18, 10)
-        O = obstacles.rectangle1
+        O = environment_details.rectangle1
 
         self.assertTrue(lines.obstacle_inside_area(p, r, O))
 
@@ -180,7 +180,7 @@ class TestLines(unittest.TestCase):
         # Test line clearly crossing through obstacle
         p = lines.Point(23, 9)
         r = lines.Point(6, 10)
-        O = obstacles.rectangle1
+        O = environment_details.rectangle1
 
         self.assertTrue(lines.obstacle_blocks_line(p, r, O),
                         "Line intersection not detected.")
@@ -189,7 +189,7 @@ class TestLines(unittest.TestCase):
         # but otherwise not intersecting
         p = lines.Point(26, 9)
         r = lines.Point(23, 9)
-        O = obstacles.hexagon
+        O = environment_details.hexagon
 
         self.assertFalse(lines.obstacle_blocks_line(p, r, O),
                          "Only ends touch, shouldn't count as intersection.")
@@ -197,7 +197,7 @@ class TestLines(unittest.TestCase):
         # Test line clearly not intersecting obstacle
         p = lines.Point(32, 23)
         r = lines.Point(35, 21)
-        O = obstacles.hexagon
+        O = environment_details.hexagon
 
         self.assertFalse(lines.obstacle_blocks_line(p, r, O),
                          "Lines are nowhere near each other, something's wrong.")
@@ -206,7 +206,7 @@ class TestLines(unittest.TestCase):
         # one of the obstacle's edges
         p = lines.Point(32, 6)
         r = lines.Point(32, 11)
-        O = obstacles.hexagon
+        O = environment_details.hexagon
 
         self.assertTrue(lines.obstacle_blocks_line(p, r, O),
                         "Line should intersect along obstacle's edge.")

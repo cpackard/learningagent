@@ -1,6 +1,6 @@
 from lines import Point, Obstacle
 
-# Obstacles for the maze
+# Visible obstacles for the maze
 rectangle1 = Obstacle([[Point(6, 2), Point(18, 2)],
                        [Point(18, 2), Point(18, 10)],
                        [Point(18, 10), Point(6, 10)],
@@ -43,5 +43,5 @@ quadrilateral = Obstacle([[Point(32, 23), Point(35, 21)],
                           [Point(29, 21), Point(32, 23)]])
 
 
-obstacles = [rectangle1, pentagon, triangle1, trapezoid,
+visible_obstacles = [rectangle1, pentagon, triangle1, trapezoid,
              triangle2, rectangle2, hexagon, quadrilateral]

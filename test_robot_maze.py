@@ -1,55 +1,59 @@
 import unittest
 import lines
-import obstacles
+import environment_details
 import robot_maze
 
 class TestRobotMaze(unittest.TestCase):
 
     def test_line_is_unblocked(self):
+        visible_obstacles = environment_details.visible_obstacles
+
         # Test line from open space to polygon
         p = lines.Point(33, 8)
         r = lines.Point(32, 11)
 
-        self.assertTrue(robot_maze.line_is_unblocked(p, r, obstacles.obstacles))
+        self.assertTrue(robot_maze.line_is_unblocked(p, r, visible_obstacles))
 
         # Test line from polygon to polygon
         p = lines.Point(29, 12)
         r = lines.Point(32, 11)
 
-        self.assertTrue(robot_maze.line_is_unblocked(p, r, obstacles.obstacles))
+        self.assertTrue(robot_maze.line_is_unblocked(p, r, visible_obstacles))
 
         # Test line along the side of a polygon
         p = lines.Point(32, 11)
         r = lines.Point(29, 21)
 
-        self.assertTrue(robot_maze.line_is_unblocked(p, r, obstacles.obstacles))
+        self.assertTrue(robot_maze.line_is_unblocked(p, r, visible_obstacles))
 
         # Test line going through obstacle
         p = lines.Point(35, 21)
         r = lines.Point(29, 21)
 
-        self.assertFalse(robot_maze.line_is_unblocked(p, r, obstacles.obstacles))
+        self.assertFalse(robot_maze.line_is_unblocked(p, r, visible_obstacles))
 
         # Test line going through obstacle, along edge of obstacle
         p = lines.Point(10, 14)
         r = lines.Point(16, 14)
 
-        self.assertFalse(robot_maze.line_is_unblocked(p, r, obstacles.obstacles))
+        self.assertFalse(robot_maze.line_is_unblocked(p, r, visible_obstacles))
 
 
     def test_visible_vertices(self):
+        visible_obstacles = environment_details.visible_obstacles
+
         # Test upper-right corner (open space)
         p = lines.Point(34, 22)
 
         self.assertEqual(set([lines.Point(32, 23), lines.Point(35, 21)]),
-                         set(robot_maze.visible_vertices(p, obstacles.obstacles)))
+                         set(robot_maze.visible_vertices(p, visible_obstacles)))
 
         # Test lower-left corner (open space)
         p = lines.Point(5, 1)
 
         self.assertEqual(set([lines.Point(5, 20), lines.Point(6, 2),
                               lines.Point(6, 10), lines.Point(18, 2)]),
-                         set(robot_maze.visible_vertices(p, obstacles.obstacles)))
+                         set(robot_maze.visible_vertices(p, visible_obstacles)))
 
 
         # Test bottom-middle (open space)
@@ -59,7 +63,7 @@ class TestRobotMaze(unittest.TestCase):
                               lines.Point(23, 9), lines.Point(27, 11),
                               lines.Point(29, 12), lines.Point(29, 3),
                               lines.Point(26, 9), lines.Point(26, 6)]),
-                         set(robot_maze.visible_vertices(p, obstacles.obstacles)))
+                         set(robot_maze.visible_vertices(p, visible_obstacles)))
 
         # Test bottom-middle (on triangle)
         p = lines.Point(23, 9)
@@ -68,7 +72,7 @@ class TestRobotMaze(unittest.TestCase):
                               lines.Point(19, 12), lines.Point(26, 6),
                               lines.Point(16, 17), lines.Point(22, 11),
                               lines.Point(26, 9), lines.Point(27, 11)]),
-                         set(robot_maze.visible_vertices(p, obstacles.obstacles)))
+                         set(robot_maze.visible_vertices(p, visible_obstacles)))
 
 
         # Test far-right vertex of pentagon
@@ -76,7 +80,7 @@ class TestRobotMaze(unittest.TestCase):
 
         self.assertEqual(set([lines.Point(8.5, 23), lines.Point(14.5, 21),
                               lines.Point(10, 14), lines.Point(13, 14)]),
-                         set(robot_maze.visible_vertices(p, obstacles.obstacles)))
+                         set(robot_maze.visible_vertices(p, visible_obstacles)))
 
         # Test bottom of quadrilateral (on vertex)
         p = lines.Point(32, 11)
@@ -84,7 +88,7 @@ class TestRobotMaze(unittest.TestCase):
         self.assertEqual(set([lines.Point(29, 12), lines.Point(32, 9),
                               lines.Point(27, 23), lines.Point(29, 21),
                               lines.Point(35, 21)]),
-                         set(robot_maze.visible_vertices(p, obstacles.obstacles)))
+                         set(robot_maze.visible_vertices(p, visible_obstacles)))
 
         # Test upper-left corner of rectangle2
         p = lines.Point(22, 23)
@@ -92,7 +96,7 @@ class TestRobotMaze(unittest.TestCase):
         self.assertEqual(set([lines.Point(27, 23), lines.Point(22, 11),
                               lines.Point(18.5, 23), lines.Point(21, 20),
                               lines.Point(18, 10), lines.Point(19, 12)]),
-                         set(robot_maze.visible_vertices(p, obstacles.obstacles)))
+                         set(robot_maze.visible_vertices(p, visible_obstacles)))
 
         # Test top of triangle1 (on triangle)
         p = lines.Point(14.5, 21)
@@ -102,10 +106,12 @@ class TestRobotMaze(unittest.TestCase):
                               lines.Point(10, 14), lines.Point(16, 17),
                               lines.Point(12, 19), lines.Point(8.5, 23),
                               lines.Point(19, 7), lines.Point(18, 10)]),
-                         set(robot_maze.visible_vertices(p, obstacles.obstacles)))
+                         set(robot_maze.visible_vertices(p, visible_obstacles)))
 
 
     def test_vertices_relative_to_agent(self):
+        visible_obstacles = environment_details.visible_obstacles
+
         # Test arbitrary points
         p = lines.Point(5, 5)
         vertices = [lines.Point(7, 7), lines.Point(4, 6),
@@ -120,14 +126,14 @@ class TestRobotMaze(unittest.TestCase):
 
         # Test open space in maze near top-left corner
         p = lines.Point(34, 22)
-        vertices = robot_maze.visible_vertices(p, obstacles.obstacles)
+        vertices = robot_maze.visible_vertices(p, visible_obstacles)
 
         self.assertEqual(set([lines.Point(-2, 1), lines.Point(1, -1)]),
                          set(robot_maze.vertices_relative_to_agent(vertices, p)))
 
         # Test on hexagon vertex in maze
         p = lines.Point(32, 6)
-        vertices = robot_maze.visible_vertices(p, obstacles.obstacles)
+        vertices = robot_maze.visible_vertices(p, visible_obstacles)
 
         self.assertEqual(set([lines.Point(-3, -3), lines.Point(0, 3),
                               lines.Point(3, 15)]),
@@ -135,7 +141,7 @@ class TestRobotMaze(unittest.TestCase):
 
         # Test open space in maze in between pentagon and triangle
         p = lines.Point(13, 19)
-        vertices = robot_maze.visible_vertices(p, obstacles.obstacles)
+        vertices = robot_maze.visible_vertices(p, visible_obstacles)
 
         self.assertEqual(set([lines.Point(-1, 0), lines.Point(-3, -5),
                               lines.Point(-4.5, 4), lines.Point(0, -5),
@@ -145,45 +151,47 @@ class TestRobotMaze(unittest.TestCase):
 
 
     def test_get_locations(self):
+        visible_obstacles = environment_details.visible_obstacles
+
         # Test upper-right corner (open space)
         p = lines.Point(34, 22)
-        vertex_list = robot_maze.visible_vertices(p, obstacles.obstacles)
+        vertex_list = robot_maze.visible_vertices(p, visible_obstacles)
         agent_vertex_list = robot_maze.vertices_relative_to_agent(vertex_list, p)
 
         self.assertEqual(set([lines.Point(34, 22), lines.Point(18, 13)]),
-                         set(robot_maze.get_locations(agent_vertex_list, obstacles.obstacles)))
+                         set(robot_maze.get_locations(agent_vertex_list, visible_obstacles)))
 
         # Test upper-left corner above pentagon (open space)
         p = lines.Point(12, 21)
-        vertex_list = robot_maze.visible_vertices(p, obstacles.obstacles)
+        vertex_list = robot_maze.visible_vertices(p, visible_obstacles)
         agent_vertex_list = robot_maze.vertices_relative_to_agent(vertex_list, p)
 
         self.assertEqual(set([lines.Point(12, 21)]),
-                         set(robot_maze.get_locations(agent_vertex_list, obstacles.obstacles)))
+                         set(robot_maze.get_locations(agent_vertex_list, visible_obstacles)))
 
         # Test lower-right corner of hexagon (on polygon)
         p = lines.Point(32, 6)
-        vertex_list = robot_maze.visible_vertices(p, obstacles.obstacles)
+        vertex_list = robot_maze.visible_vertices(p, visible_obstacles)
         agent_vertex_list = robot_maze.vertices_relative_to_agent(vertex_list, p)
 
         self.assertEqual(set([lines.Point(32, 6)]),
-                         set(robot_maze.get_locations(agent_vertex_list, obstacles.obstacles)))
+                         set(robot_maze.get_locations(agent_vertex_list, visible_obstacles)))
 
         # Test open space in middle
         p = lines.Point(5, 20)
-        vertex_list = robot_maze.visible_vertices(p, obstacles.obstacles)
+        vertex_list = robot_maze.visible_vertices(p, visible_obstacles)
         agent_vertex_list = robot_maze.vertices_relative_to_agent(vertex_list, p)
 
         self.assertEqual(set([lines.Point(5, 20)]),
-                         set(robot_maze.get_locations(agent_vertex_list, obstacles.obstacles)))
+                         set(robot_maze.get_locations(agent_vertex_list, visible_obstacles)))
 
         # Test far-left side of pentagon (on polygon)
         p = lines.Point(20, 16)
-        vertex_list = robot_maze.visible_vertices(p, obstacles.obstacles)
+        vertex_list = robot_maze.visible_vertices(p, visible_obstacles)
         agent_vertex_list = robot_maze.vertices_relative_to_agent(vertex_list, p)
 
         self.assertEqual(set([lines.Point(20, 16)]),
-                         set(robot_maze.get_locations(agent_vertex_list, obstacles.obstacles)))
+                         set(robot_maze.get_locations(agent_vertex_list, visible_obstacles)))
 
 
     def test_goal_test(self):
@@ -317,6 +325,8 @@ class TestRobotMaze(unittest.TestCase):
 
 
     def test_LRTA_star_agent(self):
+        visible_obstacles = environment_details.visible_obstacles
+
         result = {}
         cost_estimates = {}
         prev_state = None
@@ -325,7 +335,7 @@ class TestRobotMaze(unittest.TestCase):
         agent_location = lines.Point(4, 5)
 
         self.assertEqual((None, None, {}, {}), robot_maze.LRTA_star_agent(
-            agent_location, goal_point, obstacles.obstacles, result,
+            agent_location, goal_point, visible_obstacles, result,
             cost_estimates, prev_state, prev_action))
 
 
@@ -333,7 +343,7 @@ class TestRobotMaze(unittest.TestCase):
         goal_point = lines.Point(34, 22)
 
         prev_action, prev_state, result, cost_estimates = robot_maze.LRTA_star_agent(
-            agent_location, goal_point, obstacles.obstacles, result,
+            agent_location, goal_point, visible_obstacles, result,
             cost_estimates, prev_state, prev_action)
 
         self.assertEqual(cost_estimates[prev_state],
@@ -350,7 +360,7 @@ class TestRobotMaze(unittest.TestCase):
         agent_location = robot_maze.perform_action(prev_action)
 
         prev_action, prev_state, result, cost_estimates = robot_maze.LRTA_star_agent(
-            agent_location, goal_point, obstacles.obstacles, result,
+            agent_location, goal_point, visible_obstacles, result,
             cost_estimates, prev_state, prev_action)
 
         self.assertEqual(prev_state,
@@ -366,10 +376,13 @@ class TestRobotMaze(unittest.TestCase):
     def test_run_simulation(self):
         number_of_turns = 1000
         goal_point = lines.Point(34, 22)
+        goal_reward = 1000
         initial_location = lines.Point(5, 5)
+        visible_obstacles = environment_details.visible_obstacles
 
         self.assertTrue(robot_maze.run_simulation(
-            number_of_turns, goal_point, initial_location, obstacles.obstacles))
+            number_of_turns, goal_point, goal_reward,
+            initial_location, visible_obstacles))
 
 
 if __name__ == "__main__":

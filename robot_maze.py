@@ -1,13 +1,13 @@
 import lines
-import obstacles
+import environment_details
 
 
-def line_is_unblocked(p, r, obstacles):
+def line_is_unblocked(p, r, visible_obstacles):
     """
     Given a line pr and a set of obstacles, determine if any of the
     obstacles block line pr.
     """
-    for obstacle in obstacles:
+    for obstacle in visible_obstacles:
         if (lines.point_inside_own_obstacle(p, obstacle) and
             lines.point_inside_own_obstacle(r, obstacle)):
             if (not lines.line_is_valid_for_own_obstacle(p, r, obstacle) or
@@ -19,16 +19,16 @@ def line_is_unblocked(p, r, obstacles):
     return True
 
 
-def visible_vertices(p, obstacles):
+def visible_vertices(p, visible_obstacles):
     """
     Given a point p and a set of obstacles S, return a list of vertices
     visible from p.
     """
     V = []
 
-    for obstacle in obstacles:
+    for obstacle in visible_obstacles:
         for vertex in [v[0] for v in obstacle.lines]:
-            if line_is_unblocked(p, vertex, obstacles):
+            if line_is_unblocked(p, vertex, visible_obstacles):
                 V.append(vertex)
 
     return V
@@ -80,7 +80,7 @@ def actions(state):
     """
     Given a state, return a list of all possible actions from that state.
     """
-    return visible_vertices(state, obstacles.obstacles)
+    return visible_vertices(state, environment_details.visible_obstacles)
 
 
 def get_locations(percepts, obstacles):
@@ -143,7 +143,7 @@ def LRTA_star_cost(prev_state, action, state, cost_estimates, goal):
 
 
 # LRTA* algorithm from AIMA
-def LRTA_star_agent(state, goal, obstacles, result,
+def LRTA_star_agent(state, goal, visible_obstacles, result,
                     cost_estimates, prev_state, prev_action):
     """
     Given a percept that identifies the current state, return the next
@@ -175,7 +175,7 @@ def LRTA_star_agent(state, goal, obstacles, result,
         return LRTA_star_cost(state, action,
                               result.get((state, action)), cost_estimates, goal)
 
-    if line_is_unblocked(state, goal, obstacles):
+    if line_is_unblocked(state, goal, visible_obstacles):
         prev_action = goal
     else:
         prev_action = min([action for action in actions(state)], key=lrta_action_cost)
@@ -185,7 +185,8 @@ def LRTA_star_agent(state, goal, obstacles, result,
     return prev_action, prev_state, result, cost_estimates
 
 
-def run_simulation(number_of_turns, goal_point, initial_location, obstacles):
+def run_simulation(number_of_turns, goal_point, goal_reward,
+                   initial_location, visible_obstacles):
     """
     Given the number of turns allowed, run the simulation for the agent
     navigating a maze of polygons.
@@ -201,6 +202,7 @@ def run_simulation(number_of_turns, goal_point, initial_location, obstacles):
     cost_estimates = {}
     prev_state = None
     prev_action = None
+    agent_score = 0
 
     print('Agent starting at point {}'.format(initial_location))
     print('Agent goal: {}'.format(goal_point))
@@ -209,14 +211,18 @@ def run_simulation(number_of_turns, goal_point, initial_location, obstacles):
         print('Agent currently at point {}'.format(agent_location))
 
         prev_action, prev_state, result, cost_estimates = LRTA_star_agent(
-            agent_location, goal_point, obstacles, result,
+            agent_location, goal_point, visible_obstacles, result,
             cost_estimates, prev_state, prev_action)
 
         if not prev_action:
             # TODO Add logic to re-spawn the agent at a random location
             # after reaching the goal.
+            agent_score += goal_reward
+            print('Agent score: {}'.format(agent_score))
+
             print("Agent has reached the goal in {} turns!".format(
                 number_of_turns - remaining_turns - 1))
+
             return True
 
         print('Agent attempting to reach point {}'.format(prev_action))
@@ -224,6 +230,8 @@ def run_simulation(number_of_turns, goal_point, initial_location, obstacles):
         agent_location = perform_action(prev_action)
 
         print('Agent now at point {}'.format(agent_location))
+        agent_score -= lines.distance(prev_state, agent_location)
+        print('Agent score: {}'.format(agent_score))
 
         remaining_turns -= 1
 
@@ -236,7 +244,9 @@ def run_simulation(number_of_turns, goal_point, initial_location, obstacles):
 if __name__ == "__main__":
     number_of_turns = 2000
     goal_point = lines.Point(34, 22)
+    goal_reward = 1000
     initial_location = lines.Point(5, 5)
+    visible_obstacles = environment_details.visible_obstacles
 
-    run_simulation(number_of_turns, goal_point,
-                   initial_location, obstacles.obstacles)
+    run_simulation(number_of_turns, goal_point, goal_reward,
+                   initial_location, visible_obstacles)

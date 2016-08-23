@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.patches import Polygon, YAArrow, Circle
+from matplotlib.text import Text
 import ast
 import sys
 
-import obstacles
+import environment_details
 
 def update_plot(p1, p2, arrow, ax1, fig1, reset_points, line):
     """
@@ -30,6 +31,9 @@ def update_plot(p1, p2, arrow, ax1, fig1, reset_points, line):
                         headwidth=0.5, facecolor='red')
         ax1.add_patch(arrow)
         reset_points = True
+    elif 'Agent score' in l:
+        ax1.text(2, 33, 'Agent Score: {0:.2f}'.format(float(l.split()[2])),
+                 bbox=dict(facecolor='grey'))
 
     return p1, p2, arrow, ax1, fig1, reset_points
 
@@ -63,7 +67,7 @@ def process_remaining_lines(p1, p2, arrow, ax1, fig1, f):
     return
 
 
-def generate_images(input_file, name_prefix):
+def generate_images(input_file, name_prefix, visible_obstacles):
     """
     Given an input file which logs an agent's movements,
     plot and save a sequence of images which correspond
@@ -71,12 +75,13 @@ def generate_images(input_file, name_prefix):
     """
     obstacle_plots = []
 
-    for obstacle in obstacles.obstacles:
+    for obstacle in visible_obstacles:
         obstacle_plots.append([ast.literal_eval(repr(line[0]))
                                for line in obstacle.lines])
 
     fig1 = plt.figure()
     ax1 = fig1.add_subplot(111, aspect='equal', ylim=[0.0, 35], xlim=[0.0, 42])
+    ax1.text(2, 33, 'Agent Score: {}'.format(0), bbox=dict(facecolor='grey'))
 
     for ob in obstacle_plots:
         ax1.add_patch(Polygon(ob))
@@ -99,7 +104,11 @@ def generate_images(input_file, name_prefix):
 
 
 if __name__ == "__main__":
-    agent_movements = sys.argv[1]
-    name_prefix = sys.argv[2]
+    if len(sys.argv) < 3:
+        print('Usage: python plot.py agent_log_file any_naming_prefix')
+    else:
+        agent_movements = sys.argv[1]
+        name_prefix = sys.argv[2]
+        visible_obstacles = environment_details.visible_obstacles
 
-    generate_images(agent_movements, name_prefix)
+        generate_images(agent_movements, name_prefix, visible_obstacles)
