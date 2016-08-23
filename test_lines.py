@@ -152,6 +152,60 @@ class TestLines(unittest.TestCase):
         self.assertEqual(4.242640687119285, lines.distance(p1, p2))
 
 
+    def test_point_inside_own_obstacle(self):
+        # Test point is clearly vertex
+        p = lines.Point(6, 2)
+        obstacle = environment_details.rectangle1
+
+        self.assertTrue(lines.point_inside_own_obstacle(p, obstacle))
+
+        # Test point on edge of obstacle
+        p = lines.Point(10, 2)
+        obstacle = environment_details.rectangle1
+
+        self.assertFalse(lines.point_inside_own_obstacle(p, obstacle))
+
+        # Test point clearly outside obstacle
+        p = lines.Point(6, 2)
+        obstacle = environment_details.hexagon
+
+        self.assertFalse(lines.point_inside_own_obstacle(p, obstacle))
+
+
+    def test_line_is_valid_for_own_obstacle(self):
+        # Test line is part of obstacle
+        p = lines.Point(6, 2)
+        r = lines.Point(6, 10)
+        obstacle = environment_details.rectangle1
+
+        self.assertTrue(lines.line_is_valid_for_own_obstacle(p, r, obstacle))
+
+        # Test line crosses through obstacle
+        p = lines.Point(6, 2)
+        r = lines.Point(18, 10)
+        obstacle = environment_details.rectangle1
+
+        self.assertFalse(lines.line_is_valid_for_own_obstacle(p, r, obstacle))
+
+
+    def test_point_in_any_obstacle(self):
+        # Test point clearly inside obstacle
+        p = lines.Point(8, 8)
+        obstacles = environment_details.visible_obstacles
+
+        self.assertTrue(lines.point_in_any_obstacle((p.x, p.y), obstacles))
+
+        # Test point clearly outside obstacle
+        p = lines.Point(5, 5)
+        obstacles = environment_details.visible_obstacles
+
+        self.assertFalse(lines.point_in_any_obstacle((p.x, p.y), obstacles))
+
+        # Test point on edge of obstacle
+        p = lines.Point(10, 2)
+        obstacles = environment_details.visible_obstacles
+
+        self.assertFalse(lines.point_in_any_obstacle((p.x, p.y), obstacles))
 
     def test_obstacle_inside_area(self):
         # Test obstacle clearly inside area

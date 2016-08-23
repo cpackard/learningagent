@@ -1,5 +1,5 @@
 import math
-#from functools import total_ordering
+from matplotlib import path
 
 class Point():
 
@@ -12,9 +12,6 @@ class Point():
 
     def __eq__(self, other):
         return (self.x, self.y) == (other.x, other.y)
-
-    # def __lt__(self, other):
-    #     return ((self.x < other.x) and (self.y < other.y))
 
     def __hash__(self):
         return hash((self.x, self.y))
@@ -137,10 +134,9 @@ def distance(p1, p2):
     return math.sqrt((p2.x - p1.x)**2 + (p2.y - p1.y)**2)
 
 
-# TODO Write tests for the next two functions
 def point_inside_own_obstacle(p, O):
     """
-    Given a point and an obstacle, determine if p is part of O.
+    Given a point and an obstacle, determine if p is a vertex of O.
     """
     return p in [v[0] for v in O.lines]
 
@@ -158,6 +154,21 @@ def line_is_valid_for_own_obstacle(p, r, O):
             line_in_obstacle = True
 
     return line_in_obstacle
+
+
+def point_in_any_obstacle(p, obstacles):
+    """
+    Given a point p and a list of obstacles, determine if p
+    is inside any obstacles.
+    """
+    for obstacle in obstacles:
+        unique_points = [(line[0].x, line[0].y) for line in obstacle.lines]
+        matplot_obstacle = path.Path(unique_points)
+        if matplot_obstacle.contains_point((p.x, p.y)):
+            return True
+
+    return False
+
 
 def obstacle_inside_area(p, r, O):
     """

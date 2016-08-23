@@ -242,7 +242,7 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
 
 
 if __name__ == "__main__":
-    number_of_turns = 2000
+    number_of_turns = 500
     goal_point = lines.Point(34, 22)
     goal_reward = 1000
     initial_location = lines.Point(5, 5)
