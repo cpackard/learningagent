@@ -1,5 +1,6 @@
 import lines
 import environment_details
+from random import randint
 
 
 def line_is_unblocked(p, r, visible_obstacles):
@@ -185,8 +186,22 @@ def LRTA_star_agent(state, goal, visible_obstacles, result,
     return prev_action, prev_state, result, cost_estimates
 
 
+def get_new_position(obstacles, x_bounds, y_bounds):
+    """
+    Assign a random location inside the maze that isn't inside
+    any of the obstacles.
+    """
+    while True:
+        x = randint(0, x_bounds)
+        y = randint(0, y_bounds)
+
+        if not lines.point_in_any_obstacle(lines.Point(x, y), obstacles):
+            return lines.Point(x, y)
+
+
 def run_simulation(number_of_turns, goal_point, goal_reward,
-                   initial_location, visible_obstacles):
+                   initial_location, visible_obstacles,
+                   x_bounds, y_bounds):
     """
     Given the number of turns allowed, run the simulation for the agent
     navigating a maze of polygons.
@@ -203,6 +218,7 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
     prev_state = None
     prev_action = None
     agent_score = 0
+    agent_reached_goal = False
 
     print('Agent starting at point {}'.format(initial_location))
     print('Agent goal: {}'.format(goal_point))
@@ -215,15 +231,17 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
             cost_estimates, prev_state, prev_action)
 
         if not prev_action:
-            # TODO Add logic to re-spawn the agent at a random location
-            # after reaching the goal.
+            # TODO assigning None to prev_action may have unexpected
+            # consequences - make sure this works.
+            agent_location = get_new_position(visible_obstacles, x_bounds, y_bounds)
+            print('Resetting agent to point {}'.format(agent_location))
+
             agent_score += goal_reward
             print('Agent score: {}'.format(agent_score))
 
-            print("Agent has reached the goal in {} turns!".format(
-                number_of_turns - remaining_turns - 1))
+            agent_reached_goal = True
 
-            return True
+            continue
 
         print('Agent attempting to reach point {}'.format(prev_action))
 
@@ -235,18 +253,22 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
 
         remaining_turns -= 1
 
-    print('Agent failed to find goal in alloted turns.')
-    print('Final agent location: {}'.format(agent_location))
+    if not agent_reached_goal:
+        print('Agent failed to find goal in alloted turns.')
+        print('Final agent location: {}'.format(agent_location))
 
-    return False
+    return agent_reached_goal
 
 
 if __name__ == "__main__":
-    number_of_turns = 500
+    number_of_turns = 250
     goal_point = lines.Point(34, 22)
     goal_reward = 1000
     initial_location = lines.Point(5, 5)
     visible_obstacles = environment_details.visible_obstacles
+    x_bounds = environment_details.x_bounds
+    y_bounds = environment_details.y_bounds
 
     run_simulation(number_of_turns, goal_point, goal_reward,
-                   initial_location, visible_obstacles)
+                   initial_location, visible_obstacles,
+                   x_bounds, y_bounds)

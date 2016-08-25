@@ -14,26 +14,37 @@ def update_plot(p1, p2, arrow, ax1, fig1, reset_points, line):
     """
     l = line.strip()
 
-    if 'Agent has reached the goal' in l:
-        # TODO Change this when we add agent-reset logic
-        return p1, p2, arrow, ax1, fig1, reset_points
-
-    p = ast.literal_eval(l[l.find('('):])
-
-    if 'currently at point' in l:
-        p1 = Circle(p, radius=0.2, facecolor='yellow')
-        ax1.add_patch(p1)
-    elif 'attempting to reach point' in l:
-        p2 = Circle(p, radius=0.2, facecolor='green')
-        ax1.add_patch(p2)
-    elif 'now at point' in l:
-        arrow = YAArrow(fig1, p2.center, p1.center, width=0.1,
-                        headwidth=0.5, facecolor='red')
-        ax1.add_patch(arrow)
-        reset_points = True
-    elif 'Agent score' in l:
+    # if 'Resetting agent to point' in l:
+    #     # TODO Change this when we add agent-reset logic
+    #     return p1, p2, arrow, ax1, fig1, reset_points
+    if 'Agent score' in l:
         ax1.text(2, 33, 'Agent Score: {0:.2f}'.format(float(l.split()[2])),
                  bbox=dict(facecolor='grey'))
+        reset_points = True
+    else:
+        p = ast.literal_eval(l[l.find('('):])
+
+        if 'currently at point' in l:
+            p1 = Circle(p, radius=0.2, facecolor='yellow')
+            ax1.add_patch(p1)
+        elif 'attempting to reach point' in l:
+            p2 = Circle(p, radius=0.2, facecolor='green')
+            ax1.add_patch(p2)
+        elif 'now at point' in l:
+            arrow = YAArrow(fig1, p2.center, p1.center, width=0.1,
+                            headwidth=0.5, facecolor='red')
+            ax1.add_patch(arrow)
+        elif 'Resetting agent to point' in l:
+            p2 = Circle(p, radius=1, facecolor='green')
+            ax1.add_patch(p2)
+
+            arrow = YAArrow(fig1, p2.center, p1.center, width=0.25,
+                            headwidth=1, facecolor='red')
+            ax1.add_patch(arrow)
+
+    # elif 'Agent score' in l:
+    #     ax1.text(2, 33, 'Agent Score: {0:.2f}'.format(float(l.split()[2])),
+    #              bbox=dict(facecolor='grey'))
 
     return p1, p2, arrow, ax1, fig1, reset_points
 
@@ -48,7 +59,7 @@ def process_remaining_lines(p1, p2, arrow, ax1, fig1, f):
     reset_points = False
 
     for line in f:
-        file_number = (leading_zeroes [:len(leading_zeroes) - len(str(count))]
+        file_number = (leading_zeroes[:len(leading_zeroes) - len(str(count))]
                        + str(count))
 
         fig1.savefig('{}{}.png'.format(name_prefix, file_number),
@@ -63,8 +74,6 @@ def process_remaining_lines(p1, p2, arrow, ax1, fig1, f):
 
         p1, p2, arrow, ax1, fig1, reset_points = update_plot(
             p1, p2, arrow, ax1, fig1, reset_points, line)
-
-    return
 
 
 def generate_images(input_file, name_prefix, visible_obstacles):
@@ -97,7 +106,7 @@ def generate_images(input_file, name_prefix, visible_obstacles):
         l = f.readline().strip()
         goal_point = ast.literal_eval(l[l.find('('):])
 
-        ax1.add_patch(Circle(starting_point, radius=0.2, facecolor='orange'))
+        # ax1.add_patch(Circle(starting_point, radius=0.2, facecolor='orange'))
         ax1.add_patch(Circle(goal_point, radius=0.2, facecolor='orange'))
 
         process_remaining_lines(p1, p2, arrow, ax1, fig1, f)

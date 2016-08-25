@@ -305,6 +305,24 @@ class TestRobotMaze(unittest.TestCase):
         self.assertEqual(action, robot_maze.perform_action(action))
 
 
+    def test_get_new_position(self):
+        obstacles = environment_details.visible_obstacles
+        x_bounds = environment_details.x_bounds
+        y_bounds = environment_details.y_bounds
+
+        # Since positions are randomly tested, get a good sample
+        # to make sure method works as expected.
+        for i in range(0, 100):
+            new_position = robot_maze.get_new_position(obstacles,
+                                                    x_bounds, y_bounds)
+
+            self.assertTrue(0 <= new_position.x <= x_bounds)
+
+            self.assertTrue(0 <= new_position.y <= y_bounds)
+
+            self.assertFalse(lines.point_in_any_obstacle(new_position, obstacles))
+
+
     def test_LRTA_star_cost(self):
         # Test without state
         prev_state = lines.Point(1, 1)
@@ -379,10 +397,13 @@ class TestRobotMaze(unittest.TestCase):
         goal_reward = 1000
         initial_location = lines.Point(5, 5)
         visible_obstacles = environment_details.visible_obstacles
+        x_bounds = environment_details.x_bounds
+        y_bounds = environment_details.y_bounds
 
         self.assertTrue(robot_maze.run_simulation(
             number_of_turns, goal_point, goal_reward,
-            initial_location, visible_obstacles))
+            initial_location, visible_obstacles,
+            x_bounds, y_bounds))
 
 
 if __name__ == "__main__":

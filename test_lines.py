@@ -193,19 +193,19 @@ class TestLines(unittest.TestCase):
         p = lines.Point(8, 8)
         obstacles = environment_details.visible_obstacles
 
-        self.assertTrue(lines.point_in_any_obstacle((p.x, p.y), obstacles))
+        self.assertTrue(lines.point_in_any_obstacle(p, obstacles))
 
         # Test point clearly outside obstacle
         p = lines.Point(5, 5)
         obstacles = environment_details.visible_obstacles
 
-        self.assertFalse(lines.point_in_any_obstacle((p.x, p.y), obstacles))
+        self.assertFalse(lines.point_in_any_obstacle(p, obstacles))
 
         # Test point on edge of obstacle
         p = lines.Point(10, 2)
         obstacles = environment_details.visible_obstacles
 
-        self.assertFalse(lines.point_in_any_obstacle((p.x, p.y), obstacles))
+        self.assertFalse(lines.point_in_any_obstacle(p, obstacles))
 
     def test_obstacle_inside_area(self):
         # Test obstacle clearly inside area

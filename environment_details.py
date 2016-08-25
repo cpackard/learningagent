@@ -1,5 +1,9 @@
 from lines import Point, Obstacle
 
+# Farthest legal x and y coordinates, respectively
+x_bounds = 40
+y_bounds = 25
+
 # Visible obstacles for the maze
 rectangle1 = Obstacle([[Point(6, 2), Point(18, 2)],
                        [Point(18, 2), Point(18, 10)],
