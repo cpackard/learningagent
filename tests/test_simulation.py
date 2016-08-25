@@ -1,8 +1,8 @@
 import unittest
 
-import geometry_helpers
-import environment_details
-import simulation
+from learningagent import geometry_helpers
+from learningagent import environment_details
+from learningagent import simulation
 
 class TestSimulation(unittest.TestCase):
 

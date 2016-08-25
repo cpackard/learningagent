@@ -1,4 +1,4 @@
-import agent_percepts as percepts
+from learningagent import agent_percepts as percepts
 
 def goal_test(p, goal):
     """

@@ -1,4 +1,4 @@
-from geometry_helpers import Point, Obstacle
+from learningagent.geometry_helpers import Point, Obstacle
 
 # Farthest legal x and y coordinates, respectively
 x_bounds = 40

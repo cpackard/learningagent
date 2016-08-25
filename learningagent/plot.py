@@ -55,7 +55,7 @@ def process_remaining_lines(p1, p2, arrow, ax1, fig1, f):
         file_number = (leading_zeroes[:len(leading_zeroes) - len(str(count))]
                        + str(count))
 
-        fig1.savefig('{}{}.png'.format(name_prefix, file_number),
+        fig1.savefig('../visualization{}{}.png'.format(name_prefix, file_number),
                     dpi=90, bbox_inches='tight')
         count += 1
 

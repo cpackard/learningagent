@@ -1,6 +1,7 @@
 import unittest
-import geometry_helpers
-import environment_details
+
+from learningagent import geometry_helpers
+from learningagent import environment_details
 
 class TestGeometryHelpers(unittest.TestCase):
 

@@ -2,8 +2,8 @@
 
 from random import randint
 
-import geometry_helpers
-import environment_details
+from learningagent import geometry_helpers
+from learningagent import environment_details
 
 def line_is_unblocked(p, r, visible_obstacles):
     """
