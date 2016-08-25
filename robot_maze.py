@@ -1,4 +1,4 @@
-import lines
+import geometry_helpers
 import environment_details
 from random import randint
 
@@ -9,12 +9,12 @@ def line_is_unblocked(p, r, visible_obstacles):
     obstacles block line pr.
     """
     for obstacle in visible_obstacles:
-        if (lines.point_inside_own_obstacle(p, obstacle) and
-            lines.point_inside_own_obstacle(r, obstacle)):
-            if (not lines.line_is_valid_for_own_obstacle(p, r, obstacle) or
-                lines.obstacle_blocks_line(p, r, obstacle)):
+        if (geometry_helpers.point_inside_own_obstacle(p, obstacle) and
+            geometry_helpers.point_inside_own_obstacle(r, obstacle)):
+            if (not geometry_helpers.line_is_valid_for_own_obstacle(p, r, obstacle) or
+                geometry_helpers.obstacle_blocks_line(p, r, obstacle)):
                 return False
-        elif lines.obstacle_blocks_line(p, r, obstacle):
+        elif geometry_helpers.obstacle_blocks_line(p, r, obstacle):
                 return False
 
     return True
@@ -43,7 +43,7 @@ def vertices_relative_to_agent(vertices, p):
     relative_vertices = []
 
     for vertex in vertices:
-        relative_vertex = lines.Point((vertex.x - p.x), (vertex.y - p.y))
+        relative_vertex = geometry_helpers.Point((vertex.x - p.x), (vertex.y - p.y))
         relative_vertices.append(relative_vertex)
 
     return relative_vertices
@@ -62,7 +62,7 @@ def heuristic(p, goal):
     Heuristic function to return an (optimistic) cost estimate from
     point p to the goal.
     """
-    return lines.distance(p, goal)
+    return geometry_helpers.distance(p, goal)
 
 
 def actual_cost(s1, action, s2):
@@ -74,7 +74,7 @@ def actual_cost(s1, action, s2):
     # agent. Therefore, we will assume action == s2, as though the agent either
     # reached the intended destination, or recovered from an error and then
     # reached the destination.
-    return lines.distance(s1, s2)
+    return geometry_helpers.distance(s1, s2)
 
 
 def actions(state):
@@ -99,7 +99,7 @@ def get_locations(percepts, obstacles):
     for obstacle in obstacles:
         for line in obstacle.lines:
             possible_starting_points.append(
-                lines.Point((line[0].x - percepts[0].x),
+                geometry_helpers.Point((line[0].x - percepts[0].x),
                             (line[0].y - percepts[0].y)))
             unique_points.append(line[0])
 
@@ -109,7 +109,7 @@ def get_locations(percepts, obstacles):
         valid_point = True
 
         for percept in percepts:
-            vertex = lines.Point((v.x + percept.x), (v.y + percept.y))
+            vertex = geometry_helpers.Point((v.x + percept.x), (v.y + percept.y))
 
             if not any([vertex == p for p in unique_points]):
                 valid_point = False
@@ -195,8 +195,8 @@ def get_new_position(obstacles, x_bounds, y_bounds):
         x = randint(0, x_bounds)
         y = randint(0, y_bounds)
 
-        if not lines.point_in_any_obstacle(lines.Point(x, y), obstacles):
-            return lines.Point(x, y)
+        if not geometry_helpers.point_in_any_obstacle(geometry_helpers.Point(x, y), obstacles):
+            return geometry_helpers.Point(x, y)
 
 
 def run_simulation(number_of_turns, goal_point, goal_reward,
@@ -248,7 +248,7 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
         agent_location = perform_action(prev_action)
 
         print('Agent now at point {}'.format(agent_location))
-        agent_score -= lines.distance(prev_state, agent_location)
+        agent_score -= geometry_helpers.distance(prev_state, agent_location)
         print('Agent score: {}'.format(agent_score))
 
         remaining_turns -= 1
@@ -262,9 +262,9 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
 
 if __name__ == "__main__":
     number_of_turns = 250
-    goal_point = lines.Point(34, 22)
+    goal_point = geometry_helpers.Point(34, 22)
     goal_reward = 1000
-    initial_location = lines.Point(5, 5)
+    initial_location = geometry_helpers.Point(5, 5)
     visible_obstacles = environment_details.visible_obstacles
     x_bounds = environment_details.x_bounds
     y_bounds = environment_details.y_bounds

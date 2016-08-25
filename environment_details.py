@@ -1,4 +1,4 @@
-from lines import Point, Obstacle
+from geometry_helpers import Point, Obstacle
 
 # Farthest legal x and y coordinates, respectively
 x_bounds = 40
