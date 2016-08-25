@@ -14,9 +14,6 @@ def update_plot(p1, p2, arrow, ax1, fig1, reset_points, line):
     """
     l = line.strip()
 
-    # if 'Resetting agent to point' in l:
-    #     # TODO Change this when we add agent-reset logic
-    #     return p1, p2, arrow, ax1, fig1, reset_points
     if 'Agent score' in l:
         ax1.text(2, 33, 'Agent Score: {0:.2f}'.format(float(l.split()[2])),
                  bbox=dict(facecolor='grey'))
@@ -41,10 +38,6 @@ def update_plot(p1, p2, arrow, ax1, fig1, reset_points, line):
             arrow = YAArrow(fig1, p2.center, p1.center, width=0.25,
                             headwidth=1, facecolor='red')
             ax1.add_patch(arrow)
-
-    # elif 'Agent score' in l:
-    #     ax1.text(2, 33, 'Agent Score: {0:.2f}'.format(float(l.split()[2])),
-    #              bbox=dict(facecolor='grey'))
 
     return p1, p2, arrow, ax1, fig1, reset_points
 
@@ -106,7 +99,6 @@ def generate_images(input_file, name_prefix, visible_obstacles):
         l = f.readline().strip()
         goal_point = ast.literal_eval(l[l.find('('):])
 
-        # ax1.add_patch(Circle(starting_point, radius=0.2, facecolor='orange'))
         ax1.add_patch(Circle(goal_point, radius=0.2, facecolor='orange'))
 
         process_remaining_lines(p1, p2, arrow, ax1, fig1, f)
