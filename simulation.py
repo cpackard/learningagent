@@ -1,5 +1,8 @@
 # Module to simulate an agent's movements in the environment
 
+import sys
+import ast
+
 import geometry_helpers
 import environment_details
 import agent_percepts as percepts
@@ -68,14 +71,23 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
 
 
 if __name__ == "__main__":
-    number_of_turns = 250
-    goal_point = geometry_helpers.Point(34, 22)
-    goal_reward = 1000
-    initial_location = geometry_helpers.Point(5, 5)
-    visible_obstacles = environment_details.visible_obstacles
-    x_bounds = environment_details.x_bounds
-    y_bounds = environment_details.y_bounds
+    if len(sys.argv) < 5:
+        print("Usage: python simulation.py number_of_turns goal_reward"
+        " \"goal_point\" \"initial_point\"")
+    else:
+        number_of_turns = int(sys.argv[1])
+        goal_reward = int(sys.argv[2])
 
-    run_simulation(number_of_turns, goal_point, goal_reward,
-                   initial_location, visible_obstacles,
-                   x_bounds, y_bounds)
+        user_goal = ast.literal_eval(sys.argv[3])
+        goal_point = geometry_helpers.Point(user_goal[0], user_goal[1])
+
+        user_init = ast.literal_eval(sys.argv[4])
+        initial_location = geometry_helpers.Point(user_init[0], user_init[1])
+
+        visible_obstacles = environment_details.visible_obstacles
+        x_bounds = environment_details.x_bounds
+        y_bounds = environment_details.y_bounds
+
+        run_simulation(number_of_turns, goal_point, goal_reward,
+                       initial_location, visible_obstacles,
+                       x_bounds, y_bounds)
