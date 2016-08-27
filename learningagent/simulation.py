@@ -33,6 +33,17 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
     print('Agent goal: {}'.format(goal_point))
 
     while remaining_turns > 0:
+        # TODO change this to get_locations.
+        # Agent has to figure out where it is on the map itself!
+        # NOTE: changing this will also change the movement logic.
+        # Agent will have to declare which point it moves to relative
+        # to its own location, i.e.: move to vertex 2 up, 1 right.
+        # From that, it will be trivial to translate that into an
+        # absolute coordinate, from which we can make the actual move.
+        # We should also log where the agent *thinks* it is, to see
+        # the distinction.
+        # When presented with multiple possible locations, agent will
+        # pick the one that assumes it is closest to the goal.
         print('Agent currently at point {}'.format(agent_location))
 
         prev_action, prev_state, result, cost_estimates = agent.LRTA_star_agent(
