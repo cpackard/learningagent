@@ -16,6 +16,7 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
     navigating a maze of polygons.
     """
     agent_belief_state = agent.State(initial_location, 1)
+    actual_location = initial_location
     remaining_turns = number_of_turns
 
     # persistent for LRTA*
@@ -24,7 +25,7 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
     result = {}
     # a table of cost estimates indexed by state
     cost_estimates = {}
-    prev_state = None
+    prev_state = agent.State(None, 1)
     prev_action = None
     agent_score = 0
     agent_reached_goal = False
@@ -34,32 +35,27 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
     print('Agent goal: {}'.format(goal_point))
 
     while remaining_turns > 0:
-        # TODO change this to get_locations.
-        # Agent has to figure out where it is on the map itself!
-        # NOTE: changing this will also change the movement logic.
-        # Agent will have to declare which point it moves to relative
-        # to its own location, i.e.: move to vertex 2 up, 1 right.
-        # From that, it will be trivial to translate that into an
-        # absolute coordinate, from which we can make the actual move.
-        # We should also log where the agent *thinks* it is, to see
-        # the distinction.
-        # When presented with multiple possible locations, agent will
-        # pick the one that assumes it is closest to the goal.
         print('Agent currently believes it is at point {}'.format(
             agent_belief_state.location))
+        print('Agent is actually at point {}'.format(actual_location))
 
         prev_result = result
         prev_cost_estimates = cost_estimates
 
         prev_action, prev_state, result, cost_estimates = agent.LRTA_star_agent(
-            agent_belief_state, goal_point, visible_obstacles, result,
-            cost_estimates, prev_state, prev_action)
+            agent_belief_state.location, goal_point, visible_obstacles, result,
+            cost_estimates, prev_state.location, prev_action)
 
         if not prev_action:
-            # TODO assigning None to prev_action may have unexpected
-            # consequences - make sure this works.
-            agent_belief_state = percepts.get_new_position(
-                visible_obstacles, x_bounds, y_bounds)
+            # Agent reached the goal, reset to a new starting point
+            agent_belief_state = agent.State(
+                percepts.get_new_position(
+                    visible_obstacles, x_bounds, y_bounds),
+                1)
+            actual_location = agent_belief_state.location
+            belief_history = []
+            prev_state = agent.State(None, 1)
+
             print('Resetting agent to point {}'.format(
                 agent_belief_state.location))
 
@@ -70,26 +66,39 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
 
             continue
 
-        print('Agent attempting to reach point {}'.format(prev_action))
+        print('Agent believes it is attempting to reach point {}'.format(
+            prev_action))
+
+        relative_move = geometry_helpers.Point(
+            (prev_action.x - agent_belief_state.location.x),
+            (prev_action.y - agent_belief_state.location.y))
+        actual_target = geometry_helpers.Point(
+            (relative_move.x + actual_location.x),
+            (relative_move.y + actual_location.y))
+        print('Agent actually attempting to reach point {}'.format(
+            actual_target))
 
         # Simulation knows actual agent location
-        actual_agent_location = percepts.perform_action(prev_action)
+        actual_location = percepts.perform_action(prev_action)
         # Agent only knows possible locations based on relative visible vertices
         initial_locations = percepts.get_locations(
             percepts.vertices_relative_to_agent(
-                percepts.visible_vertices(actual_agent_location,
-                                          visible_obstacles)),
+                percepts.visible_vertices(actual_location,
+                                          visible_obstacles),
+                actual_location),
             visible_obstacles)
+
+        prev_state = agent_belief_state
 
         agent_belief_state, belief_history = agent.update_agent_location(
             prev_state, initial_locations, belief_history,
             prev_action, visible_obstacles,
-            prev_result, prev_cost_estimates)
+            prev_result, prev_cost_estimates, goal_point)
 
-
-        # TODO update these with 'Agent believes it is at point ...' and so on
-        print('Agent now at point {}'.format(agent_location))
-        agent_score -= geometry_helpers.distance(prev_state, agent_location)
+        
+        print('Agent now at point {}'.format(actual_location))
+        agent_score -= geometry_helpers.distance(prev_state.location,
+                                                 actual_location)
         print('Agent score: {}'.format(agent_score))
 
         remaining_turns -= 1

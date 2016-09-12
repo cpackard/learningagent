@@ -79,10 +79,6 @@ class TestAgent(unittest.TestCase):
         prev_cost_estimates = {}
         goal = geometry_helpers.Point(34, 22)
 
-        # b = geometry_helpers.Point(5, 20)
-        # prev_result[(prev_state, b)] = b
-        # prev_cost_estimates[b] = 20
-
         self.assertEqual(0.375, agent.current_state_probability(
             a, prev_state, prev_result,
             obstacles, prev_cost_estimates, goal))
@@ -271,8 +267,8 @@ class TestAgent(unittest.TestCase):
 
         self.assertEqual(geometry_helpers.Point(6, 10),
                          agent_belief_state.location)
-        self.assertEqual([[agent.State(geometry_helpers.Point(6, 10), 0.375),
-                           agent.State(geometry_helpers.Point(18, 2), 0.3)]],
+        self.assertEqual([[agent.State(geometry_helpers.Point(6, 10), 0.5),
+                           agent.State(geometry_helpers.Point(18, 2), 0.5)]],
                          belief_history)
 
 

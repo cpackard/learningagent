@@ -57,13 +57,6 @@ def prev_state_probability(a, prev_state, prev_result,
 
     visible_from_a = percepts.visible_vertices(a, visible_obstacles)
 
-    # actions_from_b = sorted([action for action in
-    #                          percepts.actions(prev_state)],
-    #                         key=prev_lrta_action_cost)
-
-    # best_actions_from_b = [v for v in actions_from_b
-    #                        if prev_lrta_action_cost(v)
-    #                        == prev_lrta_action_cost(actions_from_b[0])]
     best_actions_prev = best_actions_from_state(prev_state)
 
     if (prev_state in visible_from_a and a in best_actions_prev):
@@ -220,7 +213,7 @@ def update_agent_location(prev_state, possible_agent_locations,
         agent_belief_state, belief_history = update_certain(
             possible_agent_locations, prev_state, prev_action, belief_history)
     else:
-        if not prev_state:
+        if not prev_state or not belief_history:
             # no previous information, make best guess
             p = 1 / len(possible_agent_locations)
             current_beliefs = [State(location, p)
@@ -229,7 +222,10 @@ def update_agent_location(prev_state, possible_agent_locations,
             # Agent doesn't have any extra information, so just
             # pick the best guess
             # TODO pick one with min of lrta_action_cost
-            agent_belief_state = State(possible_agent_locations[0], p)
+            if goal in possible_agent_locations:
+                agent_belief_state = State(goal, p)
+            else:
+                agent_belief_state = State(possible_agent_locations[0], p)
         else:
             agent_belief_state, belief_history = update_uncertain(
                 possible_agent_locations, prev_state, prev_action,
@@ -237,53 +233,6 @@ def update_agent_location(prev_state, possible_agent_locations,
                 prev_cost_estimates, goal)
 
     return agent_belief_state, belief_history
-
-
-# def update_agent_location(prev_state, visible_obstacles,
-#                           prev_result, prev_cost_estimates,
-#                           initial_locations, belief_history,
-#                           prev_action):
-#     """
-#     Given a set of possible locations the agent might be,
-#     refine the location and update belief history if applicable.
-#     """
-
-#     if len(initial_locations) == 1:
-#         # Agent is certain of its current location
-
-#     if not belief_history:
-#         p = 1 / len(initial_locations)
-#         current_beliefs = [State(location, p)
-#                            for location in initial_locations]
-#         belief_history.append(current_beliefs)
-#         # Agent doesn't have any extra information, so just
-#         # pick the best guess
-#         # TODO pick one with min of lrta_action_cost
-#         agent_belief_location = initial_locations[0]
-
-#         return agent_belief_location, belief_history
-#     else:
-#         prev_possible_locations = belief_history[-1:]
-
-#         for l in sorted(prev_possible_states, key=lambda l: l.certainty):
-#             possible_agent_locations = refine_possible_locations(
-#                 l, visible_obstacles, prev_result,
-#                 prev_cost_estimates, initial_locations)
-
-
-#             if not possible_agent_locations:
-#                 # Given the agent's current percepts and its past belief state,
-#                 # there is no possible location it could be in.
-#                 # This means agent guessed the wrong state last time,
-#                 # so check the next most likely state from the last location.
-#                 continue
-#             else:
-#                 return find_current_location(l, possible_agent_locations,
-#                                              belief_history, prev_action)
-
-#         # None of the agent's past locations are compatible with
-#         # the current percepts
-#         return None, belief_history
 
 
 # LRTA* algorithm from AIMA

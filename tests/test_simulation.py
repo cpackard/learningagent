@@ -7,7 +7,7 @@ from learningagent import simulation
 class TestSimulation(unittest.TestCase):
 
     def test_run_simulation(self):
-        number_of_turns = 1000
+        number_of_turns = 250
         goal_point = geometry_helpers.Point(34, 22)
         goal_reward = 1000
         initial_location = geometry_helpers.Point(5, 5)
