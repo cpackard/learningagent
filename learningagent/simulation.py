@@ -15,63 +15,48 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
     Given the number of turns allowed, run the simulation for the agent
     navigating a maze of polygons.
     """
-    agent_belief_state = agent.State(initial_location, 1)
+    sim_agent = agent.Agent(goal_point, agent.State(initial_location, 1),
+                            visible_obstacles)
     actual_location = initial_location
     remaining_turns = number_of_turns
-
-    # persistent for LRTA*
-
-    # a table indexed by state and action
-    result = {}
-    # a table of cost estimates indexed by state
-    cost_estimates = {}
-    prev_state = agent.State(None, 1)
-    prev_action = None
-    agent_score = 0
-    agent_reached_goal = False
-    belief_history = []
 
     print('Agent starting at point {}'.format(initial_location))
     print('Agent goal: {}'.format(goal_point))
 
     while remaining_turns > 0:
         print('Agent currently believes it is at point {}'.format(
-            agent_belief_state.location))
+            sim_agent.belief_state.location))
         print('Agent is actually at point {}'.format(actual_location))
 
-        prev_result = result
-        prev_cost_estimates = cost_estimates
+        # sim_agent.next_move()
+        sim_agent.LRTA_star_agent()
 
-        prev_action, prev_state, result, cost_estimates = agent.LRTA_star_agent(
-            agent_belief_state.location, goal_point, visible_obstacles, result,
-            cost_estimates, prev_state.location, prev_action)
-
-        if not prev_action:
+        if not sim_agent.prev_action:
             # Agent reached the goal, reset to a new starting point
-            agent_belief_state = agent.State(
+            sim_agent.belief_state = agent.State(
                 percepts.get_new_position(
                     visible_obstacles, x_bounds, y_bounds),
                 1)
-            actual_location = agent_belief_state.location
-            belief_history = []
-            prev_state = agent.State(None, 1)
+            actual_location = sim_agent.belief_state.location
+            sim_agent.belief_history = []
+            sim_agent.prev_state = agent.State(None, 1)
 
             print('Resetting agent to point {}'.format(
-                agent_belief_state.location))
+                sim_agent.belief_state.location))
 
-            agent_score += goal_reward
-            print('Agent score: {}'.format(agent_score))
+            sim_agent.score += goal_reward
+            print('Agent score: {}'.format(sim_agent.score))
 
-            agent_reached_goal = True
+            sim_agent.reached_goal = True
 
             continue
 
         print('Agent believes it is attempting to reach point {}'.format(
-            prev_action))
+            sim_agent.prev_action))
 
         relative_move = geometry_helpers.Point(
-            (prev_action.x - agent_belief_state.location.x),
-            (prev_action.y - agent_belief_state.location.y))
+            (sim_agent.prev_action.x - sim_agent.belief_state.location.x),
+            (sim_agent.prev_action.y - sim_agent.belief_state.location.y))
         actual_target = geometry_helpers.Point(
             (relative_move.x + actual_location.x),
             (relative_move.y + actual_location.y))
@@ -79,7 +64,7 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
             actual_target))
 
         # Simulation knows actual agent location
-        actual_location = percepts.perform_action(prev_action)
+        actual_location = percepts.perform_action(sim_agent.prev_action)
         # Agent only knows possible locations based on relative visible vertices
         initial_locations = percepts.get_locations(
             percepts.vertices_relative_to_agent(
@@ -88,26 +73,20 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
                 actual_location),
             visible_obstacles)
 
-        prev_state = agent_belief_state
+        sim_agent.update_agent_location(initial_locations)
 
-        agent_belief_state, belief_history = agent.update_agent_location(
-            prev_state, initial_locations, belief_history,
-            prev_action, visible_obstacles,
-            prev_result, prev_cost_estimates, goal_point)
-
-        
         print('Agent now at point {}'.format(actual_location))
-        agent_score -= geometry_helpers.distance(prev_state.location,
-                                                 actual_location)
-        print('Agent score: {}'.format(agent_score))
+        sim_agent.score -= geometry_helpers.distance(
+            sim_agent.prev_state.location, actual_location)
+        print('Agent score: {}'.format(sim_agent.score))
 
         remaining_turns -= 1
 
-    if not agent_reached_goal:
+    if not sim_agent.reached_goal:
         print('Agent failed to find goal in alloted turns.')
         print('Final agent location: {}'.format(agent_location))
 
-    return agent_reached_goal
+    return sim_agent.reached_goal
 
 
 if __name__ == "__main__":
