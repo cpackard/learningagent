@@ -50,41 +50,47 @@ class Agent():
         return p == self.goal
 
 
+    def best_actions_from_state(self, s, action_cost):
+        actions_from_s = sorted([action for action in
+                                percepts.actions(s)],
+                                key=action_cost)
+
+        best_actions_from_s = [v for v in actions_from_s
+                            if action_cost(v)
+                            == action_cost(actions_from_s[0])]
+
+        return best_actions_from_s
+
+
     def _prev_state_probability(self, a):
         """
         Given that agent is currently at A, return the
         probability that the agent was previously at prev_state.
         """
-        def prev_lrta_action_cost(action):
-            return LRTA_star_cost(self.prev_state.location, action,
-                                self.prev_result.get((self.prev_state.location, action)),
-                                self.prev_cost_estimates, self.goal)
-
-        def best_actions_from_state(s):
-            actions_from_s = sorted([action for action in
-                                    percepts.actions(s)],
-                                    key=prev_lrta_action_cost)
-
-            best_actions_from_s = [v for v in actions_from_s
-                                if prev_lrta_action_cost(v)
-                                == prev_lrta_action_cost(actions_from_s[0])]
-
-            return best_actions_from_s
+        def action_cost(action):
+            return LRTA_star_cost(
+                self.prev_state.location,
+                action,
+                self.prev_result.get((self.prev_state.location, action)),
+                self.prev_cost_estimates,
+                self.goal)
 
         visible_from_a = percepts.visible_vertices(a, self.visible_obstacles)
 
-        best_actions_prev = best_actions_from_state(self.prev_state.location)
+        best_actions_prev = self.best_actions_from_state(
+            self.prev_state.location, action_cost)
 
-        if (self.prev_state.location in visible_from_a and a in best_actions_prev):
+        if (self.prev_state.location in visible_from_a
+            and a in best_actions_prev):
             # Only consider vertices visible from A which have
             # A as one of the lowest values for lrta_star_cost
-            A_in_best_actions_from_v = [v for v in visible_from_a
-                                        if a in best_actions_from_state(v)]
+            best_actions_v = [v for v in visible_from_a
+                              if a in self.best_actions_from_state(v, action_cost)]
 
-            if len(A_in_best_actions_from_v) == 0:
+            if len(best_actions_v) == 0:
                 return 0
             else:
-                return (len(best_actions_prev) / len(A_in_best_actions_from_v))
+                return (len(best_actions_prev) / len(best_actions_v))
         else:
             return 0
 
@@ -101,7 +107,8 @@ class Agent():
             self.visible_obstacles))
 
         p_of_b = 1 / len(percepts.get_locations(
-            percepts.visible_vertices(self.prev_state.location, self.visible_obstacles),
+            percepts.visible_vertices(self.prev_state.location,
+                                      self.visible_obstacles),
             self.visible_obstacles))
 
         if p_of_b == 0:
@@ -227,47 +234,40 @@ class Agent():
         LRTA_star_agent select an action according to the values of neighboring
         states, which are updated as the agent moves about the state space.
         """
-        if self.goal_test(self.belief_state.location):
+        loc = self.belief_state.location
+        prev_loc = self.prev_state.location
+
+        if self.goal_test(loc):
             self.prev_action = None
             return
 
-        if self.belief_state.location not in self.cost_estimates:
-            self.cost_estimates[self.belief_state.location] = percepts.heuristic(
-                self.belief_state.location, self.goal)
+        if loc not in self.cost_estimates:
+            self.cost_estimates[loc] = percepts.heuristic(loc, self.goal)
 
         if self.prev_state.location:
-            self.result[(self.prev_state.location, self.prev_action)] = self.belief_state.location
+            self.result[(prev_loc, self.prev_action)] = loc
 
-            self.cost_estimates[self.prev_state.location] = min(
+            self.cost_estimates[prev_loc] = min(
                 [LRTA_star_cost(
-                    self.prev_state.location,
+                    prev_loc,
                     action,
-                    self.result.get((self.prev_state.location, action)),
+                    self.result.get((prev_loc, action)),
                     self.cost_estimates,
                     self.goal)
-                for action in percepts.actions(self.prev_state.location)])
+                for action in percepts.actions(prev_loc)])
 
         def lrta_action_cost(action):
-            return LRTA_star_cost(self.belief_state.location, action,
-                                  self.result.get((self.belief_state.location, action)),
-                                  self.cost_estimates, self.goal)
+            return LRTA_star_cost(
+                loc,
+                action,
+                self.result.get((loc, action)),
+                self.cost_estimates,
+                self.goal)
 
-        if percepts.line_is_unblocked(
-                self.belief_state.location, self.goal, self.visible_obstacles):
+        if percepts.line_is_unblocked(loc, self.goal, self.visible_obstacles):
             self.prev_action = self.goal
         else:
-            self.prev_action = min([action for action
-                                    in percepts.actions(self.belief_state.location)],
+            self.prev_action = min([action for action in percepts.actions(loc)],
                                    key=lrta_action_cost)
 
         self.prev_state = self.belief_state
-
-
-    def next_move(self):
-        """
-        TODO Add description here
-        """
-        self.prev_result = self.result
-        self.prev_cost_estimates = self.cost_estimates
-
-        self.LRTA_star_agent();

@@ -94,7 +94,7 @@ def get_locations(percepts, obstacles):
         for line in obstacle.lines:
             possible_starting_points.append(
                 geometry_helpers.Point((line[0].x - percepts[0].x),
-                            (line[0].y - percepts[0].y)))
+                                       (line[0].y - percepts[0].y)))
             unique_points.append(line[0])
 
     for v in possible_starting_points:
@@ -134,5 +134,6 @@ def get_new_position(obstacles, x_bounds, y_bounds):
         x = randint(0, x_bounds)
         y = randint(0, y_bounds)
 
-        if not geometry_helpers.point_in_any_obstacle(geometry_helpers.Point(x, y), obstacles):
+        if not geometry_helpers.point_in_any_obstacle(
+                geometry_helpers.Point(x, y), obstacles):
             return geometry_helpers.Point(x, y)

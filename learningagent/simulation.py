@@ -28,14 +28,12 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
             sim_agent.belief_state.location))
         print('Agent is actually at point {}'.format(actual_location))
 
-        # sim_agent.next_move()
         sim_agent.LRTA_star_agent()
 
         if not sim_agent.prev_action:
             # Agent reached the goal, reset to a new starting point
             sim_agent.belief_state = agent.State(
-                percepts.get_new_position(
-                    visible_obstacles, x_bounds, y_bounds),
+                percepts.get_new_position(visible_obstacles, x_bounds, y_bounds),
                 1)
             actual_location = sim_agent.belief_state.location
             sim_agent.belief_history = []
@@ -57,21 +55,23 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
         relative_move = geometry_helpers.Point(
             (sim_agent.prev_action.x - sim_agent.belief_state.location.x),
             (sim_agent.prev_action.y - sim_agent.belief_state.location.y))
+
         actual_target = geometry_helpers.Point(
             (relative_move.x + actual_location.x),
             (relative_move.y + actual_location.y))
-        print('Agent actually attempting to reach point {}'.format(
-            actual_target))
+
+        print('Agent actually attempting to reach point {}'.format(actual_target))
 
         # Simulation knows actual agent location
         actual_location = percepts.perform_action(sim_agent.prev_action)
+
         # Agent only knows possible locations based on relative visible vertices
-        initial_locations = percepts.get_locations(
-            percepts.vertices_relative_to_agent(
-                percepts.visible_vertices(actual_location,
-                                          visible_obstacles),
-                actual_location),
-            visible_obstacles)
+        relative_verts = percepts.vertices_relative_to_agent(
+            percepts.visible_vertices(actual_location,
+                                      visible_obstacles),
+            actual_location)
+
+        initial_locations = percepts.get_locations(relative_verts, visible_obstacles)
 
         sim_agent.update_agent_location(initial_locations)
 
