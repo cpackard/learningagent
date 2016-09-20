@@ -91,7 +91,7 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
 
 if __name__ == "__main__":
     if len(sys.argv) < 5:
-        print("Usage: python simulation.py number_of_turns goal_reward"
+        print("Usage: python -m learninagent.simulation number_of_turns goal_reward"
         " \"goal_point\" \"initial_point\"")
     else:
         number_of_turns = int(sys.argv[1])
