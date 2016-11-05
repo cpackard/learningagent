@@ -91,22 +91,34 @@ def run_simulation(number_of_turns, goal_point, goal_reward,
 
 if __name__ == "__main__":
     if len(sys.argv) < 5:
-        print("Usage: python -m learninagent.simulation number_of_turns goal_reward"
-        " \"goal_point\" \"initial_point\"")
+        number_of_turns = 250
+        goal_reward = 1000
+        goal_point = geometry_helpers.Point(34, 22)
+        initial_location = geometry_helpers.Point(5, 5)
     else:
-        number_of_turns = int(sys.argv[1])
-        goal_reward = int(sys.argv[2])
+        try:
+            number_of_turns = int(sys.argv[1])
+            goal_reward = int(sys.argv[2])
 
-        user_goal = ast.literal_eval(sys.argv[3])
-        goal_point = geometry_helpers.Point(user_goal[0], user_goal[1])
+            user_goal = ast.literal_eval(sys.argv[3])
+            goal_point = geometry_helpers.Point(user_goal[0], user_goal[1])
 
-        user_init = ast.literal_eval(sys.argv[4])
-        initial_location = geometry_helpers.Point(user_init[0], user_init[1])
+            user_init = ast.literal_eval(sys.argv[4])
+            initial_location = geometry_helpers.Point(user_init[0], user_init[1])
+        except (ValueError, TypeError) as e:
+            print('Usage: python -m learningagent.simulation number_of_turns goal_reward goal_point initial_point')
+            print('Please enter the following for inputs:')
+            print('number_of_turns:  integer > 0        (ex: 250)')
+            print('goal_reward:      integer > 0        (ex: 1000)')
+            print('goal_point:       Tuple of integers  (ex: "(34, 22)")')
+            print('initial_location: Tuple of integers  (ex: "(5, 5)")')
+            sys.exit(1)
 
-        visible_obstacles = environment_details.visible_obstacles
-        x_bounds = environment_details.x_bounds
-        y_bounds = environment_details.y_bounds
 
-        run_simulation(number_of_turns, goal_point, goal_reward,
-                       initial_location, visible_obstacles,
-                       x_bounds, y_bounds)
+    visible_obstacles = environment_details.visible_obstacles
+    x_bounds = environment_details.x_bounds
+    y_bounds = environment_details.y_bounds
+
+    run_simulation(number_of_turns, goal_point, goal_reward, initial_location,
+                   visible_obstacles, x_bounds, y_bounds)
+
