@@ -28,10 +28,10 @@ def update_plot(p1, p2, arrow, txt, ax, fig, reset_points, line):
     else:
         p = ast.literal_eval(l[l.find('('):])
 
-        if 'currently at point' in l:
+        if 'actually at point' in l:
             p1 = Circle(p, radius=0.2, facecolor='yellow')
             ax.add_patch(p1)
-        elif 'attempting to reach point' in l:
+        elif 'actually attempting to reach point' in l:
             p2 = Circle(p, radius=0.2, facecolor='green')
             ax.add_patch(p2)
         elif 'now at point' in l:

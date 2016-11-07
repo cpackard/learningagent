@@ -29,9 +29,15 @@ $ git clone https://github.com/cpackard/learningagent.git && cd learningagent
 $ pip install -r requirements.txt
 ```
 
+Run a simulation of the agent through the environment with default arguments:
+```bash
+$ python -m learningagent.simulation 
+```
+
+
 Run a simulation of the agent through the environment:
 ```bash
-$ python -m learningagent.simulation number_of_turns goal_points goal start
+$ python -m learningagent.simulation number_of_turns goal_points goal_location start_location
 ```
 
 Example:
