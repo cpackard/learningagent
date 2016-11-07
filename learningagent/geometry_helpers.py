@@ -51,8 +51,8 @@ def line_is_valid_for_own_obstacle(p, r, O):
     line_in_obstacle = False
 
     for line in O.lines:
-        if (sorted([p, r], key=lambda p: p.x + p.y) ==
-            sorted(line, key=lambda p: p.x + p.y)):
+        if (sorted([p, r], key=lambda p: p.x + p.y)
+            == sorted(line, key=lambda p: p.x + p.y)):
             line_in_obstacle = True
 
     return line_in_obstacle
@@ -90,8 +90,8 @@ def obstacle_blocks_line(p, r, O):
     determine if any of the line segments in O intersect pr.
     """
     for line in O.lines:
-        if (p not in line and r not in line and
-            do_intersect(p, r, line[0], line[1])):
+        if (p not in line and r not in line
+            and do_intersect(p, r, line[0], line[1])):
             return True
 
     return False

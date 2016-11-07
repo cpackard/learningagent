@@ -51,19 +51,21 @@ class Agent():
         return p == self.goal
 
 
-    def best_actions_from_state(self, s, action_cost):
-        actions_from_s = sorted([action for action in
-                                percepts.actions(s)],
+    def best_actions(self, s, action_cost):
+        """
+        Given a state s and a cost function action_cost, return the actions with
+        the lowest cost.
+        """
+        actions_from_s = sorted([action for action in percepts.actions(s)],
                                 key=action_cost)
 
         best_actions_from_s = [v for v in actions_from_s
-                            if action_cost(v)
-                            == action_cost(actions_from_s[0])]
+                               if action_cost(v) == action_cost(actions_from_s[0])]
 
         return best_actions_from_s
 
 
-    def _prev_state_probability(self, a):
+    def _prev_prob(self, a):
         """
         Given that agent is currently at A, return the
         probability that the agent was previously at prev_state.
@@ -78,15 +80,14 @@ class Agent():
 
         visible_from_a = percepts.visible_vertices(a, self.visible_obstacles)
 
-        best_actions_prev = self.best_actions_from_state(
-            self.prev_state.location, action_cost)
+        best_actions_prev = self.best_actions(self.prev_state.location, action_cost)
 
         if (self.prev_state.location in visible_from_a
             and a in best_actions_prev):
             # Only consider vertices visible from A which have
             # A as one of the lowest values for lrta_star_cost
             best_actions_v = [v for v in visible_from_a
-                              if a in self.best_actions_from_state(v, action_cost)]
+                              if a in self.best_actions(v, action_cost)]
 
             if len(best_actions_v) == 0:
                 return 0
@@ -96,21 +97,23 @@ class Agent():
             return 0
 
 
-    def _current_state_probability(self, a):
+    def _current_prob(self, a):
         """
         Given that the agent was previously in prev_state, return the
         probability that the agent is currently in state a.
         """
-        p_of_b_given_a = self._prev_state_probability(a)
-
-        p_of_a = 1 / len(percepts.get_locations(
+        a_locations = len(percepts.get_locations(
             percepts.visible_vertices(a, self.visible_obstacles),
             self.visible_obstacles))
 
-        p_of_b = 1 / len(percepts.get_locations(
+        b_locations = len(percepts.get_locations(
             percepts.visible_vertices(self.prev_state.location,
                                       self.visible_obstacles),
             self.visible_obstacles))
+
+        p_of_a = 1 / a_locations
+        p_of_b = 1 / b_locations
+        p_of_b_given_a = self._prev_prob(a)
 
         if p_of_b == 0:
             # Unless the agent is somehow teleported inside of a circle,
@@ -121,7 +124,7 @@ class Agent():
             return p_of_b_given_a * p_of_a / p_of_b
 
 
-    def _refine_possible_locations(self, possible_locations):
+    def _refine_loc(self, possible_locations):
         """
         Given a list of possible locations from agent percepts, narrow
         down the possibile locations based on agent's previous location.
@@ -129,7 +132,7 @@ class Agent():
         possible_states = []
 
         for s in possible_locations:
-            p = self._current_state_probability(s)
+            p = self._current_prob(s)
             if p > 0:
                 possible_states.append(State(s, p))
 
@@ -171,7 +174,7 @@ class Agent():
         refine its estimates to maximize the certainty of its current location.
         """
         # See if we can narrow down the location
-        refined_locations = self._refine_possible_locations(possible_locations)
+        refined_locations = self._refine_loc(possible_locations)
 
         if len(refined_locations) == 1:
             return self.update_agent_location([refined_locations[0].location])
@@ -181,27 +184,23 @@ class Agent():
 
             for l in sorted(prev_possible_states, key=lambda l: l.certainty):
                 self.prev_state = l
-                refined_locations = self._refine_possible_locations(
-                    possible_locations)
+                refined_locations = self._refine_loc(possible_locations)
 
                 if not refined_locations:
                     # Current percepts and past state are incompatible,
                     # check the next past state with the most certainty
                     continue
                 else:
-                    return self._update_uncertain(
-                        [s.location for s in refined_locations])
+                    return self._update_uncertain([s.location for s in refined_locations])
         else:
             # agent is unsure of past or current location, make best guess
             self.belief_history.append(refined_locations)
-            self.belief_state = max(refined_locations,
-                                    key=lambda s: s.certainty)
+            self.belief_state = max(refined_locations, key=lambda s: s.certainty)
 
 
     def update_agent_location(self, possible_locations):
         """
-        Given a list of possible locations,
-        determine the agent's current location.
+        Given a list of possible locations, determine the agent's current location.
         If agent is certain of current location, update belief history if
         applicable. Otherwise, return the state with the highest certainty and
         add this set of beliefs to the belief history.
@@ -217,6 +216,7 @@ class Agent():
                 current_beliefs = [State(location, p)
                                    for location in possible_locations]
                 self.belief_history.append(current_beliefs)
+
                 # TODO pick one with min of lrta_action_cost
                 if self.goal in possible_locations:
                     self.belief_state = State(self.goal, p)

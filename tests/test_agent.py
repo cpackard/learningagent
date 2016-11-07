@@ -50,7 +50,7 @@ class TestAgent(unittest.TestCase):
         sim_agent.prev_cost_estimates = {}
         sim_agent.prev_state = agent.State(geometry_helpers.Point(32, 23), 1)
 
-        self.assertEqual(0, sim_agent._prev_state_probability(a))
+        self.assertEqual(0, sim_agent._prev_prob(a))
 
         # Test location A not an optimal move from prev_state
         a = geometry_helpers.Point(5, 20)
@@ -58,7 +58,7 @@ class TestAgent(unittest.TestCase):
         sim_agent.prev_result[(sim_agent.prev_state.location, a)] = a
         sim_agent.prev_cost_estimates[a] = 50
 
-        self.assertEqual(0, sim_agent._prev_state_probability(a))
+        self.assertEqual(0, sim_agent._prev_prob(a))
 
         # Test location A is visible from prev_state, and is an
         # optimal move from prev_state
@@ -67,7 +67,7 @@ class TestAgent(unittest.TestCase):
         sim_agent.prev_state = agent.State(geometry_helpers.Point(6, 2), 1)
         a = geometry_helpers.Point(6, 10)
 
-        self.assertEqual(0.375, sim_agent._prev_state_probability(a))
+        self.assertEqual(0.375, sim_agent._prev_prob(a))
 
 
     def test_current_state_probability(self):
@@ -81,7 +81,7 @@ class TestAgent(unittest.TestCase):
         sim_agent.prev_cost_estimates = {}
         sim_agent.prev_result = {}
 
-        self.assertEqual(0.375, sim_agent._current_state_probability(a))
+        self.assertEqual(0.375, sim_agent._current_prob(a))
 
 
     def test_refine_possible_locations(self):
@@ -95,28 +95,26 @@ class TestAgent(unittest.TestCase):
         sim_agent.prev_result = {}
         sim_agent.prev_cost_estimates = {}
 
-        self.assertEqual([], sim_agent._refine_possible_locations(
-            possible_locations))
+        self.assertEqual([], sim_agent._refine_loc(possible_locations))
 
         # prev_state not visible from any of the possible locations
         possible_locations = [geometry_helpers.Point(35, 21)]
 
-        self.assertEqual([], sim_agent._refine_possible_locations(
-            possible_locations))
+        self.assertEqual([], sim_agent._refine_loc(possible_locations))
 
         # only point (6, 10) from possible_locations is visible
         possible_locations = [geometry_helpers.Point(6, 10),
                               geometry_helpers.Point(35, 21)]
 
         self.assertEqual([agent.State(geometry_helpers.Point(6, 10), 0.375)],
-                         sim_agent._refine_possible_locations(possible_locations))
+                         sim_agent._refine_loc(possible_locations))
 
         # Sanity check, a refined list of locations shouldn't be
         # updated again.
         possible_locations = [geometry_helpers.Point(6, 10)]
 
         self.assertEqual([agent.State(geometry_helpers.Point(6, 10), 0.375)],
-                         sim_agent._refine_possible_locations(possible_locations))
+                         sim_agent._refine_loc(possible_locations))
 
 
     def test_update_certain(self):

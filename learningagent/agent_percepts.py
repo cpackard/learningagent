@@ -2,8 +2,8 @@
 
 from random import randint
 
-from learningagent import geometry_helpers
-from learningagent import environment_details
+from learningagent import geometry_helpers as geom
+from learningagent import environment_details as env
 
 def line_is_unblocked(p, r, visible_obstacles):
     """
@@ -11,12 +11,12 @@ def line_is_unblocked(p, r, visible_obstacles):
     obstacles block line pr.
     """
     for obstacle in visible_obstacles:
-        if (geometry_helpers.point_inside_own_obstacle(p, obstacle) and
-            geometry_helpers.point_inside_own_obstacle(r, obstacle)):
-            if (not geometry_helpers.line_is_valid_for_own_obstacle(p, r, obstacle) or
-                geometry_helpers.obstacle_blocks_line(p, r, obstacle)):
+        if (geom.point_inside_own_obstacle(p, obstacle) and
+            geom.point_inside_own_obstacle(r, obstacle)):
+            if (not geom.line_is_valid_for_own_obstacle(p, r, obstacle) or
+                geom.obstacle_blocks_line(p, r, obstacle)):
                 return False
-        elif geometry_helpers.obstacle_blocks_line(p, r, obstacle):
+        elif geom.obstacle_blocks_line(p, r, obstacle):
                 return False
 
     return True
@@ -45,7 +45,7 @@ def vertices_relative_to_agent(vertices, p):
     relative_vertices = []
 
     for vertex in vertices:
-        relative_vertex = geometry_helpers.Point((vertex.x - p.x), (vertex.y - p.y))
+        relative_vertex = geom.Point((vertex.x - p.x), (vertex.y - p.y))
         relative_vertices.append(relative_vertex)
 
     return relative_vertices
@@ -56,7 +56,7 @@ def heuristic(p, goal):
     Heuristic function to return an (optimistic) cost estimate from
     point p to the goal.
     """
-    return geometry_helpers.distance(p, goal)
+    return geom.distance(p, goal)
 
 
 def actual_cost(s1, action, s2):
@@ -68,14 +68,14 @@ def actual_cost(s1, action, s2):
     # agent. Therefore, we will assume action == s2, as though the agent either
     # reached the intended destination, or recovered from an error and then
     # reached the destination.
-    return geometry_helpers.distance(s1, s2)
+    return geom.distance(s1, s2)
 
 
 def actions(state):
     """
     Given a state, return a list of all possible actions from that state.
     """
-    return visible_vertices(state, environment_details.visible_obstacles)
+    return visible_vertices(state, env.visible_obstacles)
 
 
 def get_locations(percepts, obstacles):
@@ -92,9 +92,8 @@ def get_locations(percepts, obstacles):
     # any points inside an obstacle
     for obstacle in obstacles:
         for line in obstacle.lines:
-            possible_starting_points.append(
-                geometry_helpers.Point((line[0].x - percepts[0].x),
-                                       (line[0].y - percepts[0].y)))
+            possible_starting_points.append(geom.Point((line[0].x - percepts[0].x),
+                                                       (line[0].y - percepts[0].y)))
             unique_points.append(line[0])
 
     for v in possible_starting_points:
@@ -103,7 +102,7 @@ def get_locations(percepts, obstacles):
         valid_point = True
 
         for percept in percepts:
-            vertex = geometry_helpers.Point((v.x + percept.x), (v.y + percept.y))
+            vertex = geom.Point((v.x + percept.x), (v.y + percept.y))
 
             if not any([vertex == p for p in unique_points]):
                 valid_point = False
@@ -134,6 +133,5 @@ def get_new_position(obstacles, x_bounds, y_bounds):
         x = randint(0, x_bounds)
         y = randint(0, y_bounds)
 
-        if not geometry_helpers.point_in_any_obstacle(
-                geometry_helpers.Point(x, y), obstacles):
-            return geometry_helpers.Point(x, y)
+        if not geom.point_in_any_obstacle(geom.Point(x, y), obstacles):
+            return geom.Point(x, y)
