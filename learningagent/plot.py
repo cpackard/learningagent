@@ -74,7 +74,7 @@ def process_remaining_lines(p1, p2, arrow, txt, ax, fig, im, f):
             p1, p2, arrow, txt, ax, fig, reset_points, line)
 
 
-def generate_frames(p1, p2, arrow, txt, ax, fig, im, f):
+def generate_frames(p1, p2, arrow, txt, ax, fig, f):
     """
     Record each frame of agent movement and compile the results into a video.
     """
@@ -128,25 +128,25 @@ def create_video(input_file, line_count, video_name, visible_obstacles):
                                for line in obstacle.lines])
 
     # initialize plot and obstacles for the maze
-    fig = plt.figure(frameon=false)
+    fig = plt.figure(frameon=False)
     txt = plt.text(2, 33, 'agent score: {}'.format(0), fontsize=8)
     ax = fig.add_subplot(111, aspect='equal', ylim=[0.0, 35], xlim=[0.0, 42])
 
     for ob in obstacle_plots:
-        ax.add_patch(polygon(ob))
+        ax.add_patch(Polygon(ob))
 
-    arrow = none
-    p1 = none
-    p2 = none
+    arrow = None
+    p1 = None
+    p2 = None
 
     # remove extra border around subplot
     frame = plt.gca()
-    frame.axes.get_xaxis().set_visible(false)
-    frame.axes.get_yaxis().set_visible(false)
-    frame.set_frame_on(false)
+    frame.axes.get_xaxis().set_visible(False)
+    frame.axes.get_yaxis().set_visible(False)
+    frame.set_frame_on(False)
 
     with open(input_file) as f:
-        generate_frames(p1, p2, arrow, txt, ax, fig, im, f)
+        generate_frames(p1, p2, arrow, txt, ax, fig, f)
 
 
 if __name__ == "__main__":
