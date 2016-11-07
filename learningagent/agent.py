@@ -13,17 +13,6 @@ class State():
                 and self.certainty == other.certainty)
 
 
-def LRTA_star_cost(prev_state, action, state, cost_estimates, goal):
-    """
-    Returns the f-value of a given state: g(s) + h(s)
-    """
-    if state is None:
-        return percepts.heuristic(prev_state, goal)
-    else:
-        return (percepts.actual_cost(prev_state, action, state)
-                + cost_estimates[state])
-
-
 class Agent():
     def __init__(self, goal, belief_state, visible_obstacles):
         self.goal = goal
@@ -40,6 +29,18 @@ class Agent():
         self.score = 0
         self.reached_goal = False
         self.belief_history = []
+
+
+    @staticmethod
+    def LRTA_star_cost(prev_state, action, state, cost_estimates, goal):
+        """
+        Returns the f-value of a given state: g(s) + h(s)
+        """
+        if state is None:
+            return percepts.heuristic(prev_state, goal)
+        else:
+            return (percepts.actual_cost(prev_state, action, state)
+                    + cost_estimates[state])
 
 
     def goal_test(self, p):
@@ -68,7 +69,7 @@ class Agent():
         probability that the agent was previously at prev_state.
         """
         def action_cost(action):
-            return LRTA_star_cost(
+            return self.LRTA_star_cost(
                 self.prev_state.location,
                 action,
                 self.prev_result.get((self.prev_state.location, action)),
@@ -248,7 +249,7 @@ class Agent():
             self.result[(prev_loc, self.prev_action)] = loc
 
             self.cost_estimates[prev_loc] = min(
-                [LRTA_star_cost(
+                [self.LRTA_star_cost(
                     prev_loc,
                     action,
                     self.result.get((prev_loc, action)),
@@ -257,7 +258,7 @@ class Agent():
                 for action in percepts.actions(prev_loc)])
 
         def lrta_action_cost(action):
-            return LRTA_star_cost(
+            return self.LRTA_star_cost(
                 loc,
                 action,
                 self.result.get((loc, action)),

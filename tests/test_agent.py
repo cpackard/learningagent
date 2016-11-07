@@ -26,14 +26,15 @@ class TestAgent(unittest.TestCase):
         cost_estimates = {geometry_helpers.Point(3, 1): 2,
                           geometry_helpers.Point(1, 1): 4}
         goal_point = geometry_helpers.Point(5, 1)
+        a = agent.Agent(goal_point, None, None)
 
-        self.assertEqual(4, agent.LRTA_star_cost(prev_state, action,
+        self.assertEqual(4, a.LRTA_star_cost(prev_state, action,
                                                  state, cost_estimates,
                                                  goal_point))
 
         # Test with state
         state = geometry_helpers.Point(3, 1)
-        self.assertEqual(4, agent.LRTA_star_cost(prev_state, action,
+        self.assertEqual(4, a.LRTA_star_cost(prev_state, action,
                                                  state, cost_estimates,
                                                  goal_point))
 
