@@ -2,6 +2,14 @@ Online Learning Agent
 ==========================
 This package implements the maze-navigating agent from chapter 4 of Artificial Intelligence: A Modern Approach. The challenge is this: given a maze of known and unknown obstacles, create an agent that can continuously learn and navigate the environment.
 
+## Quickstart
+Running the agent simulation requires Python 3.
+```bash
+$ git clone https://github.com/cpackard/learningagent.git && cd learningagent
+$ pip install -r requirements.txt
+$ python -m learningagent.simulation
+```
+
 ## Example
 Below is an example simulation of the agent in an environment. The agent is penalized 1 point for every unit of distance moved, rewarded 1000 points every time it reaches the goal, and has 250 turns to maximize its score.
 
@@ -15,7 +23,11 @@ The agent boasts a number of features that allow it to excel in an unfamiliar te
 - **Real-Time Learning:** The agent is guided by the Learning Real-Time A-Star algorithm, so it is encouraged to explore unseen parts of the map in search of the best path to the goal. While this creates a high initial overhead during the first round of exploration, subsequent rounds become significantly easier as the agent updates its internal map of the environment.
 
 ## Usage
-To use this package, clone this repository and run the following commands from the top-level directory of the package:
+Project setup:
+```bash
+$ git clone https://github.com/cpackard/learningagent.git && cd learningagent
+$ pip install -r requirements.txt
+```
 
 Run a simulation of the agent through the environment:
 ```bash
