@@ -1,5 +1,5 @@
 Online Learning Agent
-==========================
+===========================
 This package implements the maze-navigating agent from chapter 4 of Artificial Intelligence: A Modern Approach. The challenge is this: given a maze of known and unknown obstacles, create an agent that can continuously learn and navigate the environment.
 
 ## Quickstart
