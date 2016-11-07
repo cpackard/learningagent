@@ -74,79 +74,88 @@ def process_remaining_lines(p1, p2, arrow, txt, ax, fig, im, f):
             p1, p2, arrow, txt, ax, fig, reset_points, line)
 
 
-def generate_images(input_file, line_count, video_name, visible_obstacles):
+def generate_frames(p1, p2, arrow, txt, ax, fig, im, f):
+    """
+    Record each frame of agent movement and compile the results into a video.
+    """
+    # Initialize plot with start and goal points
+    l = f.readline().strip()
+    starting_point = ast.literal_eval(l[l.find('('):])
+    l = f.readline().strip()
+    goal_point = ast.literal_eval(l[l.find('('):])
+
+    ax.add_patch(Circle(goal_point, radius=0.2, facecolor='orange'))
+
+    # Draw initial state of the maze
+    fig.canvas.draw()
+    data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+    data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+    im = ax.imshow(data)
+
+    def animate(data, im):
+        im.set_data(data)
+
+    # Generator for the rest of the agent's movements, which
+    # gets passed as the data parameter for each call to animate.
+    remaining_lines = process_remaining_lines(p1, p2, arrow, txt, ax, fig, im, f)
+    # the first two lines are about environment setup, rather than agent movement
+    agent_turns = line_count - 2
+
+    ani = animation.FuncAnimation(
+        fig=fig,
+        func=animate,
+        frames=remaining_lines,
+        interval=10,
+        fargs=(im, ),
+        repeat=False,
+        save_count=agent_turns)
+    writer = animation.writers['ffmpeg'](fps=15, codec='libx264', bitrate=-1)
+
+    ani.save('{}.mp4'.format(video_name), writer=writer, dpi=100)
+
+
+def create_video(input_file, line_count, video_name, visible_obstacles):
     """
     Given an input file which logs an agent's movements,
-    plot and save a sequence of images which correspond
-    to those movements.
+    create a video file which records the sequence of movements.
     """
     obstacle_plots = []
 
-    # Convert obstacles into lists of tuples so matplotlib can
+    # convert obstacles into lists of tuples so matplotlib can
     # understand them.
     for obstacle in visible_obstacles:
         obstacle_plots.append([ast.literal_eval(repr(line[0]))
                                for line in obstacle.lines])
 
-    # Initialize plot and obstacles for the maze
-    fig = plt.figure(frameon=False)
-    txt = plt.text(2, 33, 'Agent Score: {}'.format(0), fontsize=8)
+    # initialize plot and obstacles for the maze
+    fig = plt.figure(frameon=false)
+    txt = plt.text(2, 33, 'agent score: {}'.format(0), fontsize=8)
     ax = fig.add_subplot(111, aspect='equal', ylim=[0.0, 35], xlim=[0.0, 42])
 
     for ob in obstacle_plots:
-        ax.add_patch(Polygon(ob))
+        ax.add_patch(polygon(ob))
 
-    arrow = None
-    p1 = None
-    p2 = None
+    arrow = none
+    p1 = none
+    p2 = none
 
-    # Remove extra border around subplot
+    # remove extra border around subplot
     frame = plt.gca()
-    frame.axes.get_xaxis().set_visible(False)
-    frame.axes.get_yaxis().set_visible(False)
-    frame.set_frame_on(False)
+    frame.axes.get_xaxis().set_visible(false)
+    frame.axes.get_yaxis().set_visible(false)
+    frame.set_frame_on(false)
 
     with open(input_file) as f:
-        # Initialize plot with start and goal points
-        l = f.readline().strip()
-        starting_point = ast.literal_eval(l[l.find('('):])
-        l = f.readline().strip()
-        goal_point = ast.literal_eval(l[l.find('('):])
-
-        ax.add_patch(Circle(goal_point, radius=0.2, facecolor='orange'))
-
-        # Draw initial state of the maze
-        fig.canvas.draw()
-        data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
-        data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
-        im = ax.imshow(data)
-
-        def animate(data, im):
-            im.set_data(data)
-
-        # Generator for the rest of the agent's movements, which
-        # gets passed as the data parameter for each call to animate.
-        remaining_lines = process_remaining_lines(p1, p2, arrow, txt,
-                                                  ax, fig, im, f)
-
-        ani = animation.FuncAnimation(
-            fig=fig, func=animate,
-            frames=remaining_lines,
-            interval=10, fargs=(im, ),
-            repeat=False, save_count=line_count-2)
-        writer = animation.writers['ffmpeg'](fps=15, codec='libx264', bitrate=-1)
-
-        ani.save('{}.mp4'.format(video_name), writer=writer, dpi=100)
+        generate_frames(p1, p2, arrow, txt, ax, fig, im, f)
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 4:
-        print('Usage: python plot.py agent_log_file file_line_count video_name')
+        print('usage: python plot.py agent_log_file file_line_count video_name')
     else:
         agent_movements = sys.argv[1]
         line_count = int(sys.argv[2])
         video_name = sys.argv[3]
         visible_obstacles = environment_details.visible_obstacles
 
-        generate_images(agent_movements, line_count,
-                        video_name, visible_obstacles)
+        create_video(agent_movements, line_count, video_name, visible_obstacles)
