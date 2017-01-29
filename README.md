@@ -1,6 +1,9 @@
-Online Learning Agent
+Maze Learning Agent
 ===========================
-This package implements the maze-navigating agent from chapter 4 of Artificial Intelligence: A Modern Approach. The challenge is this: given a maze of known and unknown obstacles, create an agent that can continuously learn and navigate the environment.
+This package implements a maze-navigating agent capable of navigating towards a goal point in an unknown environment. Given only a partial map of the environment, the agent must:
+- deduce its current location given the obstacles it can see,
+- update its internal map of the environment as it explores, and
+- attempt to reach the goal in the shortest distant possible
 
 ## Quickstart
 Running the agent simulation requires Python 3, pip, and optionally (but recommended) virtualenv.
